@@ -6,7 +6,12 @@
 
 Heimdall is an advanced and modular smart-contract toolkit which aims to make dealing with smart contracts on EVM based chains easier. 
 
-## Usage
+## Installation & Usage
+
+Install dependencies from ``requirements.txt``.
+```
+pip install -r requirements.txt
+```
 
 Heimdall operates off the ``argparse`` library, with modules specifying which operation you with to perform.
 
@@ -64,7 +69,7 @@ Specific module documentation can be found in the ``/docs`` folder, or quickly n
 
 ## Configuration
 
-You may save 
+You may save environment information, such as remote and local providers, to the configuration folder in ``env/conf.json``.
 
 ## Contributing
 
