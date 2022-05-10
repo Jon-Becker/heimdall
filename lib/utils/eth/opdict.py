@@ -1,0 +1,381 @@
+import math
+from bidict import bidict
+
+class Opcode:
+  def __init__(self, query, *args):
+    if isinstance(query, (int,)):
+      self.int = query
+      self.hex = hex(query)
+      if query in opcodeDict:
+        self.opcode = opcodeDict[query].upper()
+      else:
+        self.opcode = 'unknown operation' 
+    else:
+      self.opcode = query.upper()
+      if query.lower() in opcodeDict.inverse:
+        self.int = opcodeDict.inverse[query.lower()]
+        self.hex = hex(self.int)
+      else:
+        self.opcode = 'unknown operation' 
+        self.hex = 0xFE
+        self.int = 254
+    
+    self.inputs = None if self.int not in opArgNs else opArgNs[self.int]
+opcodeDict = bidict({
+  #
+  # Stop and Arithmetic
+  #
+  0x00: "stop",
+  0x01: "add",
+  0x02: "mul",
+  0x03: "sub",
+  0x04: "div",
+  0x05: "sdiv",
+  0x06: "mod",
+  0x07: "smod",
+  0x08: "addmod",
+  0x09: "mulmod",
+  0x0A: "exp",
+  0x0B: "signextend",
+  #
+  # Comparison and Bitwise Logic
+  #
+  0x10: "lt",
+  0x11: "gt",
+  0x12: "slt",
+  0x13: "sgt",
+  0x14: "eq",
+  0x15: "iszero",
+  0x16: "and",
+  0x17: "or",
+  0x18: "xor",
+  0x19: "not",
+  0x1A: "byte",
+  0x1B: "shl",
+  0x1C: "shr",
+  0x1D: "sar",
+  #
+  # Sha3
+  #
+  0x20: "sha3",
+  #
+  # Environment Information
+  #
+  0x30: "address",
+  0x31: "balance",
+  0x32: "origin",
+  0x33: "caller",
+  0x34: "callvalue",
+  0x35: "calldataload",
+  0x36: "calldatasize",
+  0x37: "calldatacopy",
+  0x38: "codesize",
+  0x39: "codecopy",
+  0x3A: "gasprice",
+  0x3B: "extcodesize",
+  0x3C: "extcodecopy",
+  0x3D: "returndatasize",
+  0x3E: "returndatacopy",
+  0x3F: "extcodehash",
+  #
+  # Block Information
+  #
+  0x40: "blockhash",
+  0x41: "coinbase",
+  0x42: "timestamp",
+  0x43: "number",
+  0x44: "difficulty",
+  0x45: "gaslimit",
+  0x46: "chainid",
+  0x47: "selfbalance",
+  #
+  # Stack, Memory, Storage and Flow Operations
+  #
+  0x50: "pop",
+  0x51: "mload",
+  0x52: "mstore",
+  0x53: "mstore8",
+  0x54: "sload",
+  0x55: "sstore",
+  0x56: "jump",
+  0x57: "jumpi",
+  0x58: "pc",
+  0x59: "msize",
+  0x5A: "gas",
+  0x5B: "jumpdest",
+  #
+  # Push Operations
+  #
+  0x60: "push1",
+  0x61: "push2",
+  0x62: "push3",
+  0x63: "push4",
+  0x64: "push5",
+  0x65: "push6",
+  0x66: "push7",
+  0x67: "push8",
+  0x68: "push9",
+  0x69: "push10",
+  0x6A: "push11",
+  0x6B: "push12",
+  0x6C: "push13",
+  0x6D: "push14",
+  0x6E: "push15",
+  0x6F: "push16",
+  0x70: "push17",
+  0x71: "push18",
+  0x72: "push19",
+  0x73: "push20",
+  0x74: "push21",
+  0x75: "push22",
+  0x76: "push23",
+  0x77: "push24",
+  0x78: "push25",
+  0x79: "push26",
+  0x7A: "push27",
+  0x7B: "push28",
+  0x7C: "push29",
+  0x7D: "push30",
+  0x7E: "push31",
+  0x7F: "push32",
+  #
+  # Duplicate Operations
+  #
+  0x80: "dup1",
+  0x81: "dup2",
+  0x82: "dup3",
+  0x83: "dup4",
+  0x84: "dup5",
+  0x85: "dup6",
+  0x86: "dup7",
+  0x87: "dup8",
+  0x88: "dup9",
+  0x89: "dup10",
+  0x8A: "dup11",
+  0x8B: "dup12",
+  0x8C: "dup13",
+  0x8D: "dup14",
+  0x8E: "dup15",
+  0x8F: "dup16",
+  #
+  # Exchange Operations
+  #
+  0x90: "swap1",
+  0x91: "swap2",
+  0x92: "swap3",
+  0x93: "swap4",
+  0x94: "swap5",
+  0x95: "swap6",
+  0x96: "swap7",
+  0x97: "swap8",
+  0x98: "swap9",
+  0x99: "swap10",
+  0x9A: "swap11",
+  0x9B: "swap12",
+  0x9C: "swap13",
+  0x9D: "swap14",
+  0x9E: "swap15",
+  0x9F: "swap16",
+  #
+  # Logging
+  #
+  0xA0: "log0",
+  0xA1: "log1",
+  0xA2: "log2",
+  0xA3: "log3",
+  0xA4: "log4",
+  #
+  # System
+  #
+  0xF0: "create",
+  0xF1: "call",
+  0xF2: "callcode",
+  0xF3: "return",
+  0xF4: "delegatecall",
+  0xF5: "create2",
+  0xFA: "staticcall",
+  0xFD: "revert",
+  0xFE: "invalid",
+  0xFF: "selfdestruct",
+})
+
+opArgNs = {
+  #
+  # Stop and Arithmetic
+  #
+  0x00: 0,
+  0x01: 2,
+  0x02: 2,
+  0x03: 2,
+  0x04: 2,
+  0x05: 2,
+  0x06: 2,
+  0x07: 2,
+  0x08: 3,
+  0x09: 3,
+  0x0A: 2,
+  0x0B: 2,
+  #
+  # Comparison and Bitwise Logic
+  #
+  0x10: 2,
+  0x11: 2,
+  0x12: 2,
+  0x13: 2,
+  0x14: 2,
+  0x15: 1,
+  0x16: 2,
+  0x17: 2,
+  0x18: 2,
+  0x19: 1,
+  0x1A: 2,
+  0x1B: 2,
+  0x1C: 2,
+  0x1D: 2,
+  #
+  # Sha3
+  #
+  0x20: 2,
+  #
+  # Environment Information
+  #
+  0x30: 0,
+  0x31: 1,
+  0x32: 0,
+  0x33: 0,
+  0x34: 0,
+  0x35: 1,
+  0x36: 0,
+  0x37: 3,
+  0x38: 0,
+  0x39: 3,
+  0x3A: 0,
+  0x3B: 1,
+  0x3C: 4,
+  0x3D: 0,
+  0x3E: 3,
+  0x3F: 1,
+  #
+  # Block Information
+  #
+  0x40: 1,
+  0x41: 0,
+  0x42: 0,
+  0x43: 0,
+  0x44: 0,
+  0x45: 0,
+  0x46: 0,
+  0x47: 0,
+  #
+  # Stack, Memory, Storage and Flow Operations
+  #
+  0x50: 1,
+  0x51: 1,
+  0x52: 2,
+  0x53: 2,
+  0x54: 1,
+  0x55: 2,
+  0x56: 1,
+  0x57: 2,
+  0x58: 0,
+  0x59: 0,
+  0x5A: 0,
+  0x5B: 0,
+  #
+  # Push Operations
+  #
+  0x60: 0,
+  0x61: 0,
+  0x62: 0,
+  0x63: 0,
+  0x64: 0,
+  0x65: 0,
+  0x66: 0,
+  0x67: 0,
+  0x68: 0,
+  0x69: 0,
+  0x6A: 0,
+  0x6B: 0,
+  0x6C: 0,
+  0x6D: 0,
+  0x6E: 0,
+  0x6F: 0,
+  0x70: 0,
+  0x71: 0,
+  0x72: 0,
+  0x73: 0,
+  0x74: 0,
+  0x75: 0,
+  0x76: 0,
+  0x77: 0,
+  0x78: 0,
+  0x79: 0,
+  0x7A: 0,
+  0x7B: 0,
+  0x7C: 0,
+  0x7D: 0,
+  0x7E: 0,
+  0x7F: 0,
+  #
+  # Duplicate Operations
+  #
+  0x80: 1,
+  0x81: 2,
+  0x82: 3,
+  0x83: 4,
+  0x84: 5,
+  0x85: 6,
+  0x86: 7,
+  0x87: 8,
+  0x88: 9,
+  0x89: 10,
+  0x8A: 11,
+  0x8B: 12,
+  0x8C: 13,
+  0x8D: 14,
+  0x8E: 15,
+  0x8F: 16,
+  #
+  # Exchange Operations
+  #
+  0x90: 2,
+  0x91: 3,
+  0x92: 4,
+  0x93: 5,
+  0x94: 6,
+  0x95: 7,
+  0x96: 8,
+  0x97: 9,
+  0x98: 10,
+  0x99: 11,
+  0x9A: 12,
+  0x9B: 13,
+  0x9C: 14,
+  0x9D: 15,
+  0x9E: 16,
+  0x9F: 17,
+  #
+  # Logging
+  #
+  0xA0: 2,
+  0xA1: 3,
+  0xA2: 4,
+  0xA3: 5,
+  0xA4: 6,
+  #
+  # System
+  #
+  0xF0: 3,
+  0xF1: 7,
+  0xF2: 7,
+  0xF3: 2,
+  0xF4: 6,
+  0xF5: 4,
+  0xFA: 6,
+  0xFD: 2,
+  0xFE: 0,
+  0xFF: 1,
+}
+
+def _offsetToMemoryName(offset, prefix=False): 
+  return f'var{hex(math.floor(offset/4))[2:].ljust(2, "0")}'

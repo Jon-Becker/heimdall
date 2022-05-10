@@ -1,0 +1,8 @@
+requests==2.26.0
+web3==5.28.0
+numpy==1.22.3
+bidict==0.22.0
+alive-progress==2.4.1
+argparse==1.4.0
+argcomplete==2.0.0
+eth_abi==2.1.1
