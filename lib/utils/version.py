@@ -8,7 +8,7 @@ def getLocalVersion():
 
 def getLatestRelease():
   try:
-    releaseRequest = requests.get('https://api.github.com/repos/Jon-Becker/nft-generator-py/releases', timeout=3)
+    releaseRequest = requests.get('https://api.github.com/repos/Jon-Becker/heimdall/releases', timeout=3)
     if releaseRequest.status_code == 200:
       request_body = json.loads(releaseRequest.text)
       return request_body
