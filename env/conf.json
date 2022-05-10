@@ -6,7 +6,7 @@
 
     "providers": {
       "local": "http://127.0.0.1:7545",
-      "remote": "https://mainnet.infura.io/v3/422705d85b5c4923b841a60ba0c01129"
+      "remote": "https://mainnet.infura.io/v3/"
     }
 
   },
