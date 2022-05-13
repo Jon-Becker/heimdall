@@ -1,0 +1,8 @@
+requests
+web3
+numpy
+bidict
+alive-progress
+argparse
+argcomplete
+eth_abi

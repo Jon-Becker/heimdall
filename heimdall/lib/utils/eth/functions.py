@@ -81,6 +81,7 @@ def resolveFunctions(assembly, args, output):
       pass
     except Exception as e:
       if args.verbose:
+        traceback.print_exc()
         log('info', f'Ignoring signature {colorLib.CYAN}{hex(sig)}{colorLib.RESET}. Trace execution excepted!')
     
   if args.verbose:

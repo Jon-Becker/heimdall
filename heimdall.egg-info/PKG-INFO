@@ -1,0 +1,10 @@
+Metadata-Version: 2.1
+Name: heimdall
+Version: 1.0.0rc1
+Summary: Heimdall is an advanced and modular smart-contract toolkit which aims to make dealing with smart contracts on EVM based chains easier.
+Home-page: https://github.com/Jon-Becker/heimdall
+Author: Jonathan Becker (jon-becker)
+Author-email: jonathan@jbecker.dev
+License: MIT
+Keywords: ethereum,evm,decompiler,evm decompiler,smart contract,smart contract decompiler,evm smart contract decompiler,eth contract decompiler
+License-File: LICENSE

@@ -1,0 +1,2 @@
+[console_scripts]
+heimdall = heimdall.__main__:main
