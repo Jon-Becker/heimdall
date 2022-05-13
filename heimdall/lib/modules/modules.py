@@ -1,6 +1,6 @@
 import os
 import importlib
-import traceback
+import pathlib
 from lib.utils.colors import colorLib
 
 from lib.utils.logger import log
@@ -9,7 +9,7 @@ def getModules(args=None):
   mods = []
   max_title_length = 0
   max_description_length = 0
-  for item in os.listdir("./heimdall/lib/modules"):
+  for item in os.listdir(pathlib.Path(__file__).parent.resolve()):
     if item.endswith('.py') and not "modules" in item:
       try:
         temp = importlib.import_module(f'lib.modules.{item.replace(".py", "")}')

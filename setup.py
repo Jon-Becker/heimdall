@@ -1,8 +1,8 @@
 from setuptools import Extension
 from setuptools import setup
 
-setup(name='heimdall',
-      version='1.0.0-rc.1',
+setup(name='eth_heimdall',
+      version='1.0.0-rc.3',
       description='Heimdall is an advanced and modular smart-contract toolkit which aims to make dealing with smart contracts on EVM based chains easier.',
       url='https://github.com/Jon-Becker/heimdall',
       entry_points={'console_scripts': ['heimdall=heimdall.__main__:main']},
