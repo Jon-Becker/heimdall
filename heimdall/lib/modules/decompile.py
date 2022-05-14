@@ -34,7 +34,7 @@ def main(args):
         log('warning', f'Provider not set! Using default remote provider from configuration.')
         
         log('info', 'Establishing connection to provider...')
-        
+      else:
         if "http" in args.provider.lower():
           web3 = Web3(Web3.HTTPProvider(args.provider, request_kwargs={'timeout': 3}))
         elif "wss" in args.provider.lower():
