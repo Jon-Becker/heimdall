@@ -30,7 +30,7 @@ def main(args):
     
     if not args.local:
       if not args.provider:
-        args.provider = lib.config.getConfig()['defaults']['providers']['remote']
+        args.provider = getConfig()['defaults']['providers']['remote']
         log('warning', f'Provider not set! Using default remote provider from configuration.')
         
         log('info', 'Establishing connection to provider...')
