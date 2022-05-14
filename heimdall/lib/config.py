@@ -10,7 +10,7 @@ def getConfig():
   except:
     conf = {
       "build": {
-        "version": "1.0.1-rc.6"
+        "version": "v1.0.1-rc8"
       },
       "defaults": {
 
