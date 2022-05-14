@@ -15,7 +15,7 @@ from re import L, M
 from Crypto.Hash import keccak
 sha3 = lambda x: keccak.new(digest_bits=256, data=x).digest()
 
-from lib.utils.eth.opdict import opcodeDict, opArgNs, _offsetToMemoryName
+from .eth.opdict import opcodeDict, opArgNs, _offsetToMemoryName
 
 class Logic:
   def __init__(self):

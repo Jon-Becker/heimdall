@@ -1,7 +1,7 @@
 import datetime
 from alive_progress import alive_it
 
-from lib.utils.colors import colorLib
+from .colors import colorLib
 
 def log(type, message):
   if(type == "warning"):

@@ -8,11 +8,11 @@ from web3 import Web3
 web3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/422705d85b5c4923b841a60ba0c01129"))
 
 
-from lib.utils.logger import log
-from lib.utils.colors import colorLib
-from lib.utils.logic import Logic, offsetToMemoryName
-from lib.utils.eth.classes.stack import Stack
-from lib.utils.eth.classes.memory import Memory
+from ...logger import log
+from ...colors import colorLib
+from ...logic import Logic, offsetToMemoryName
+from ...eth.classes.stack import Stack
+from ...eth.classes.memory import Memory
 
 from Crypto.Hash import keccak
 sha3 = lambda x: keccak.new(digest_bits=256, data=x).digest()

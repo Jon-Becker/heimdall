@@ -1,5 +1,5 @@
-from lib.utils.colors import colorLib
-from lib.utils.version import getLocalVersion
+from ..utils.colors import colorLib
+from ..utils.version import getLocalVersion
 
 def getHeader():
   return (

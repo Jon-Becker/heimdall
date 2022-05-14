@@ -1,4 +1,4 @@
-from lib.utils.logic import listContainsList
+from ..logic import listContainsList
 
 def resolve(int):
   versions = ['Homestead', 'Byzantium', 'Constantinople', 'Istanbul', 'London', 'ArrowGlacier']

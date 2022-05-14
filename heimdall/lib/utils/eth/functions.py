@@ -7,14 +7,14 @@ import re
 import traceback
 
 from bidict import bidict
-from lib.config import loadFileAsPickle
-from lib.utils.apis.sigdir import resolve
+from ...config import loadFileAsPickle
+from ..apis.sigdir import resolve
 
-from lib.utils.logger import log, progress_bar
-from lib.utils.io import makePath, outputDirectory, write, pathExists, writeObj
-from lib.utils.colors import colorLib
-from lib.utils.eth.classes.vm import VirtualMachine
-from lib.utils.eth.classes.function import Function
+from ..logger import log, progress_bar
+from ..io import makePath, outputDirectory, write, pathExists, writeObj
+from ..colors import colorLib
+from ..eth.classes.vm import VirtualMachine
+from ..eth.classes.function import Function
 
 def traceHistory(trace, _i=0):
   return trace[-1*(_i+1)]

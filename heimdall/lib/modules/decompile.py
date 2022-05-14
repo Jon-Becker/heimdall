@@ -2,17 +2,17 @@ from hashlib import sha256
 import os
 import datetime
 import re
-import lib.config
 
 from web3 import Web3
 
-from lib.utils.logger import log, query
-from lib.utils.colors import colorLib
-from lib.utils.io import outputDirectory, pathExists, readFile, write
-from lib.utils.eth.disassembler import disassemble
-from lib.utils.eth.builder import build
-from lib.utils.apis.etherscan import fetchSourceCode
-from lib.utils.eth.version import detectVersion, resolve
+from ..config import *
+from ..utils.logger import log, query
+from ..utils.colors import colorLib
+from ..utils.io import outputDirectory, pathExists, readFile, write
+from ..utils.eth.disassembler import disassemble
+from ..utils.eth.builder import build
+from ..utils.apis.etherscan import fetchSourceCode
+from ..utils.eth.version import detectVersion, resolve
 
 meta = {
   "title": "Decompile",

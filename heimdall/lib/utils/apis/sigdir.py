@@ -2,8 +2,8 @@ import os
 import json
 import requests
 
-from lib.utils.logger import log
-from lib.utils.colors import colorLib
+from ..logger import log
+from ..colors import colorLib
 
 def resolve(args, signature, type="signatures"):
   try:

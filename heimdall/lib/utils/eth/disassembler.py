@@ -2,10 +2,10 @@ import os
 import math
 import json
 
-from lib.utils.logger import log
-from lib.utils.colors import colorLib
-from lib.utils.io import outputDirectory, write
-from lib.utils.eth.opdict import opcodeDict
+from ..logger import log
+from ..colors import colorLib
+from ..io import outputDirectory, write
+from ..eth.opdict import opcodeDict
 
 
 def disassemble(bytecode, output, args):

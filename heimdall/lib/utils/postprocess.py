@@ -1,7 +1,7 @@
 import re
 import traceback
 
-from lib.utils.logic import Logic
+from .logic import Logic
 
 
 def postProcess(_line, signatures, events, constantStorage):

@@ -4,9 +4,9 @@ import json
 import time
 import requests
 
-from lib.utils.logger import log
-from lib.utils.colors import colorLib
-from lib.utils.io import outputDirectory, write, makePath
+from ..logger import log
+from ..colors import colorLib
+from ..io import outputDirectory, write, makePath
 
 def fetchSourceCode(args, output, onlyAbi=False):
   log('info', 'Attempting to fetch source from EtherScan...')

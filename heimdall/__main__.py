@@ -6,15 +6,15 @@ import sys
 import importlib
 import traceback
 
-from lib.modules.modules import getModules
 
 from timeit import default_timer as timer
 
-from lib.utils.colors import colorLib
-from lib.menus.header import getHeader
-from lib.menus.help import getHelp
-from lib.utils.logger import log
-from lib.utils.version import getLocalVersion, getRemoteVersion
+from .lib.modules.modules import getModules
+from .lib.utils.colors import colorLib
+from .lib.menus.header import getHeader
+from .lib.menus.help import getHelp
+from .lib.utils.logger import log
+from .lib.utils.version import getLocalVersion, getRemoteVersion
 
 def main(argv=None):
   command = 'clear'
@@ -44,7 +44,7 @@ def main(argv=None):
   heimdall.add_argument('--flush', help="Flushes the cache", action="store_true")
   heimdall.add_argument('--ignore-cache', help="Ignores the cache (SLOWER!)", action="store_true")
 
-  args = heimdall.parse_args(argv[1:])
+  args = heimdall.parse_args()
   try:
     if args.help:
       print(getHelp())
@@ -56,7 +56,7 @@ def main(argv=None):
 
         available_modules = getModules(args)
         if args.module.lower().isdigit() and (int(args.module) <= len(available_modules[0])-1):
-          selected_module = importlib.import_module(available_modules[0][int(args.module)]['import'])
+          selected_module = importlib.import_module(available_modules[0][int(args.module)]['import'], package='heimdall')
           handled = True
           try:
             selected_module.main(args)
@@ -66,7 +66,7 @@ def main(argv=None):
         else:
           for module in available_modules[0]:
             if args.module.lower() == module["title"].lower():
-              selected_module = importlib.import_module(module['import'])
+              selected_module = importlib.import_module(module['import'], package='heimdall')
               handled = True
               try:
                 selected_module.main(args)

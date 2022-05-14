@@ -2,12 +2,12 @@ from copy import deepcopy
 import re
 from web3 import Web3
 
-from lib.utils.logic import Any, Logic, _match, bytesToType, commonTypes, determineType, solidify_wrapped, offsetToMemoryName, solidify
-from lib.utils.apis.sigdir import resolve
-from lib.utils.eth.classes.vm import VirtualMachine
-from lib.utils.eth.classes.stack import Stack
-from lib.utils.logger import log, query, progress_bar
-from lib.utils.colors import colorLib
+from ...logic import Any, Logic, _match, bytesToType, commonTypes, determineType, solidify_wrapped, offsetToMemoryName, solidify
+from ...apis.sigdir import resolve
+from ...eth.classes.vm import VirtualMachine
+from ...eth.classes.stack import Stack
+from ...logger import log, query, progress_bar
+from ...colors import colorLib
 
 class Function():
   def __init__(self, args, signature, assembly, endDispatcher, index=None, indices=None, potentialNames=None, params=None):

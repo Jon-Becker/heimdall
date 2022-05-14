@@ -1,10 +1,10 @@
 import requests
 import json
 
-import lib.config
+from ..config import *
 
 def getLocalVersion():
-  return lib.config.getConfig()['build']['version']
+  return getConfig()['build']['version']
 
 def getLatestRelease():
   try:

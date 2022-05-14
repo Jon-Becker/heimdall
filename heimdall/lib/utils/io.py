@@ -1,7 +1,7 @@
 import os
 import pickle
-from lib.utils.logger import log
-from lib.utils.colors import colorLib
+from .logger import log
+from .colors import colorLib
 
 def outputDirectory(outpath, target):
   if outpath:

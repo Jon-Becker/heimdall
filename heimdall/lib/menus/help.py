@@ -1,9 +1,9 @@
 import os
 import importlib
 
-from lib.modules.modules import getModules
-from lib.utils.colors import colorLib
-from lib.utils.version import getLocalVersion
+from ..modules.modules import getModules
+from ..utils.colors import colorLib
+from ..utils.version import getLocalVersion
 
 def getHelp():
   

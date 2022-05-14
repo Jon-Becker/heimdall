@@ -6,13 +6,13 @@ from numpy import sign
 
 from bidict import bidict
 
-from lib.utils.logger import log, progress_bar
-from lib.utils.version import getLocalVersion
-from lib.utils.colors import colorLib
-from lib.utils.postprocess import postProcess
-from lib.utils.version import getLatestSolidityRelease
-from lib.utils.io import appendLine, write
-from lib.utils.eth.functions import resolveFunctions
+from ..logger import log, progress_bar
+from ..version import getLocalVersion
+from ..colors import colorLib
+from ..postprocess import postProcess
+from ..version import getLatestSolidityRelease
+from ..io import appendLine, write
+from ..eth.functions import resolveFunctions
 
 def build(assembly, args, output, web3, onlyAbi=False):
   sys.setrecursionlimit(5000)

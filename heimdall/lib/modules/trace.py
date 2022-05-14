@@ -2,7 +2,7 @@ import datetime
 
 from timeit import default_timer as timer
 
-from lib.utils.logger import log
+from ..utils.logger import log
 
 meta = {
   "title": "Trace",
