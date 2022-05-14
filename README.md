@@ -8,9 +8,8 @@ Heimdall is an advanced and modular smart-contract toolkit which aims to make de
 
 ## Installation & Usage
 
-Install dependencies from ``requirements.txt``.
 ```
-pip install -r requirements.txt
+pip install eth-heimdall
 ```
 
 Heimdall operates off the ``argparse`` library, with modules specifying which operation you with to perform.

@@ -9,7 +9,7 @@ ___
 ### Usage
 
 ```
-python3 heimdall.py -m decompile -t TARGET
+heimdall -m decompile -t TARGET
 ```
 
 ### Optional Arguments
