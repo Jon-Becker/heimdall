@@ -17,8 +17,8 @@ def main(args):
   if not args.open:
     editFile = query('info', 'N', 'Would you like to edit the configuration file? (y/N):')
     
-  if editFile.lower() == "y" or args.open:
-    if os.name == 'posix':
+  if args.open or editFile.lower() == "y":
+    if os.name not in ('nt', 'dos'):
       os.system(f'nano {configPath}')
     else:
       os.system(f'edit {configPath}')

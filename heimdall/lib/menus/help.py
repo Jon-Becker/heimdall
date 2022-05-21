@@ -17,10 +17,7 @@ def getHelp():
     modules.append(f'{str(len(modules)-2).rjust(9)}  |{item["title"].rjust(fetched_modules[1]+2)}  |{item["description"].rjust(fetched_modules[2]+2)}')
   
   return (
-    f'''Usage: {colorLib.BOLD}heimdall [-m/--module] MODULE [-t/--target] VALUE [-o path] [-n value]
-                                     [-p value] [-p value] [--redeploy]
-                                     [--beautify] [--version] [--update]
-                                     [-v] [-h] [--redeploy] [--beautify]{colorLib.RESET}
+    f'''Usage: {colorLib.BOLD}heimdall [-m/--module] MODULE [-v] [--default] [-arguments]{colorLib.RESET}
 
 Powerful Ethereum smart contract toolkit for forensics, manipulation, and research.
 
