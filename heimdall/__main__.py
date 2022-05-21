@@ -43,6 +43,7 @@ def main(argv=None):
   heimdall.add_argument('--default', help="Always use defaults when prompted for input", action="store_true")
   heimdall.add_argument('--flush', help="Flushes the cache", action="store_true")
   heimdall.add_argument('--ignore-cache', help="Ignores the cache (SLOWER!)", action="store_true")
+  heimdall.add_argument('--open', '--edit', help="Attempts to open nano / edit on the operation", action="store_true")  
 
   args = heimdall.parse_args()
   try:

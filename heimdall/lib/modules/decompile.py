@@ -1,7 +1,4 @@
 from hashlib import sha256
-import os
-import datetime
-import re
 
 from web3 import Web3
 

@@ -45,6 +45,7 @@ Options:
     -p URL, --provider URL            URL of custom Ethereum provider
 
   Additional:
+    --open, --edit                    Attempts to open nano / edit on the operation
     --redeploy ID                     Redeploys the contract from -n onto ID
     --beautify                        Attempts to beautify the downloaded contract using
                                         statistical renaming and spacing

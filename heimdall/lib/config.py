@@ -39,3 +39,6 @@ def loadFileAsPickle(path):
   with open(path, 'rb') as pathFile:
     contents = pickle.load(pathFile)
   return contents
+
+def getConfigPath():
+  return f'{pathlib.Path(__file__).parent.parent.resolve()}/env/conf.json'
