@@ -18,9 +18,9 @@ heimdall/lib/menus/__init__.py
 heimdall/lib/menus/header.py
 heimdall/lib/menus/help.py
 heimdall/lib/modules/__init__.py
+heimdall/lib/modules/config.py
 heimdall/lib/modules/decompile.py
 heimdall/lib/modules/modules.py
-heimdall/lib/modules/trace.py
 heimdall/lib/utils/__init__.py
 heimdall/lib/utils/colors.py
 heimdall/lib/utils/io.py

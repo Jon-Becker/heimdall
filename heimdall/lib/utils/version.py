@@ -1,21 +1,22 @@
+import pip_api
 import requests
 import json
 
 from ..config import *
 
+def getRemoteVersion():
+  releaseRequest = requests.get('https://pypi.python.org/pypi/eth-heimdall/json', timeout=3)
+  if releaseRequest.status_code == 200:
+    latestVersionBody = json.loads(releaseRequest.text)
+    return str(latestVersionBody['info']['version'].strip())
+  return getLocalVersion()
+
 def getLocalVersion():
-  return getConfig()['build']['version']
-
-def getLatestRelease():
   try:
-    releaseRequest = requests.get('https://api.github.com/repos/Jon-Becker/heimdall/releases', timeout=3)
-    if releaseRequest.status_code == 200:
-      request_body = json.loads(releaseRequest.text)
-      return request_body
-    return False
+    return str(pip_api.installed_distributions(local=False)['eth-heimdall'].version)
   except:
-    return False
-
+    return str(getConfig()['build']['version'])
+  
 def getLatestSolidityRelease():
   try:
     releaseRequest = requests.get('https://api.github.com/repos/ethereum/solidity/releases', timeout=3)
@@ -25,15 +26,6 @@ def getLatestSolidityRelease():
     return '>=0.8.0'
   except:
     return '>=0.8.0'
-
-def getRemoteVersion():
-  try:
-    latestRelease = getLatestRelease()
-    if latestRelease != False:
-      return latestRelease[0]["name"]
-    return False
-  except:
-    return False
 
 def update():
   pass

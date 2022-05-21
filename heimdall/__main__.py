@@ -14,7 +14,7 @@ from .lib.utils.colors import colorLib
 from .lib.menus.header import getHeader
 from .lib.menus.help import getHelp
 from .lib.utils.logger import log
-from .lib.utils.version import getLocalVersion, getRemoteVersion
+from .lib.utils.version import getRemoteVersion, getLocalVersion
 
 def main(argv=None):
   command = 'clear'
@@ -22,9 +22,11 @@ def main(argv=None):
       command = 'cls'
   os.system(command)
   print(getHeader())
-  if getLocalVersion() != getRemoteVersion() and getRemoteVersion() != False:
+  
+  if getRemoteVersion() != getLocalVersion():
     log('alert', f'This version of Heimdall is outdated!')
-    log('alert', f'Version {colorLib.GREEN}{getRemoteVersion()}{colorLib.RESET} is available at {colorLib.GREEN}https://github.com/Jon-Becker/heimdall/releases/tag/{getRemoteVersion()}{colorLib.RESET}')
+    log('alert', f'You can update to version {colorLib.GREEN}{getRemoteVersion()}{colorLib.RESET} by running: {colorLib.GREEN}pip install eth-heimdall --upgrade{colorLib.RESET} !')
+    print()
 
   heimdall = argparse.ArgumentParser(prog='heimdall', usage='heimdall [options]', add_help=False)
 
