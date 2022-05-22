@@ -1,0 +1,17 @@
+[
+    {
+        "name": "Config",
+        "version": "v1.0.0",
+        "checksum": "f79b784d432a5db496b25b306630ad2a"
+    },
+    {
+        "name": "Debug",
+        "version": "v1.0.0",
+        "checksum": "b3d4355fe26e66d056eabe59327458bc"
+    },
+    {
+        "name": "Decompile",
+        "version": "v1.0.0",
+        "checksum": "644a462d96ded66657258abb1537f8c3"
+    }
+]

@@ -1,1 +1,2 @@
 include heimdall/env/conf.json
+include heimdall/lib/modules/dist.json
