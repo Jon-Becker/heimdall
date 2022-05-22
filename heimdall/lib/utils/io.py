@@ -1,4 +1,5 @@
 import os
+import hashlib
 import pickle
 from .logger import log
 from .colors import colorLib
@@ -47,3 +48,13 @@ def readFile(path):
   with open(path) as f:
     lines = f.readlines()
   return lines
+
+def checksum(directory, result=None):
+  result = result if result else ''
+  for item in os.listdir(directory):
+    if item.endswith("py"):
+      result = hashlib.md5((str(open(f'{directory}/{item}','rb').read()) + result).encode('utf-8')).hexdigest()
+    elif "." not in item:
+      result = checksum(f'{directory}/{item}', result)
+      
+  return result

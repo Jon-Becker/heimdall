@@ -378,4 +378,7 @@ opArgNs = {
 }
 
 def _offsetToMemoryName(offset, prefix=False): 
-  return f'var{hex(math.floor(offset/4))[2:].ljust(2, "0")}'
+  try:
+    return f'var{hex(math.floor(offset/4))[2:].ljust(2, "0")}'
+  except:
+    return offset

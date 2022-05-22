@@ -35,8 +35,9 @@ Options:
 
         #  |       Name  |                                           Description    
            |             |                                                      
-        0  |     Config  |       Easily modify the configuration on Heimdall
-        1  |  Decompile  |  Decompile and download the target smart contract
+        0  |     Config  |           Easily modify the configuration on Heimdall
+        1  |      Debug  |              Easily access Heimdall debug information
+        2  |  Decompile  |      Decompile and download the target smart contract
 
   Parameters:
     -m MODULE, --module MODULE        Operation module, either name or number from list

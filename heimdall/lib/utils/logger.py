@@ -9,9 +9,6 @@ from .colors import colorLib
 global logfile
 logfile = f'{pathlib.Path(__file__).parent.parent.parent.resolve()}/logs/heimdall-{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}.log'
 
-def initLogfile(command):
-  logStripColor(logfile , "info", " ".join(command))
-
 def logStripColor(file, type, log):
   with open(file,'a') as f:
     f.write(re.sub(r'(\\033|)\[\d*m', '', "{} {}\n".format(get_prefix(type), log)))
@@ -22,7 +19,7 @@ def logTraceback(error, silent=False):
   tracebackFiles = []
   for file in (traceback):
     if "File \"/" in file:
-      tracebackFiles.append("".join(", ".join(file.split(", ")[0:2]).split('"')[1:]))
+      tracebackFiles.append("".join(" , ".join(file.split(", ")[0:2]).split('"')[1:]))
   
   for i, file in enumerate(tracebackFiles):
     errorLogString += f'\n{" "*29}{"├" if i+1 < len(tracebackFiles) else "└"}─({colorLib.RED}{i}{colorLib.RESET}) {file}'

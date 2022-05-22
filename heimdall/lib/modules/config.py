@@ -12,7 +12,7 @@ meta = {
 
 def main(args):
   configPath = getConfigPath()
-  log('info', f'Heimdall configuration is located at: {colorLib.UNDERLINE+colorLib.CYAN+ configPath +colorLib.RESET}.')
+  log('info', f'Heimdall configuration is located at: {colorLib.UNDERLINE+colorLib.CYAN+ configPath +colorLib.RESET} .')
   
   if not args.open:
     editFile = query('info', 'N', 'Would you like to edit the configuration file? (y/N):')
