@@ -1,12 +1,13 @@
 from copy import deepcopy
 import re
+import traceback
 from web3 import Web3
 
 from ...logic import Any, Logic, _match, bytesToType, commonTypes, determineType, solidify_wrapped, offsetToMemoryName, solidify
 from ...apis.sigdir import resolve
 from ...eth.classes.vm import VirtualMachine
 from ...eth.classes.stack import Stack
-from ...logger import log, query, progress_bar
+from ...logger import log, logTraceback, query, progress_bar
 from ...colors import colorLib
 
 class Function():
@@ -73,8 +74,8 @@ class Function():
           return resolve(entries, False)
         return resolve(entries, logJump)
       except Exception as e:
-        if self.args.verbose:
-          log('warning', 'Exception encountered when resolving function index.')
+        log('warning', 'Exception encountered when resolving function index.', not self.args.verbose)
+        logTraceback(traceback.format_exc(), True)
     return resolve()
   def resolveParams(self):
     def trace(calldata, startPoint=1, stack=Stack(), stacktrace=[], handled=[]):
@@ -117,7 +118,7 @@ class Function():
               if call['opcode'] in ['CALL', 'CALLCODE']:
                 callParameters.pop(2)
               
-              print(callParameters)
+              #print(callParameters)
               self.logic.append([call['pc'] ,f'(bool success, bytes{callParameters[-1]} memory ext0) = address({Web3.toChecksumAddress(Logic.padHex(None, callParameters[1], 40))}).staticcall();'])
               
               self.view = False
@@ -298,7 +299,7 @@ class Function():
     ret = []
     if self.name:
       try:
-        ret = re.search(r'\((.{1,999999999})\)', self.name).group(1).split(",")
+        ret = re.search(r'\((.{1,})\)', self.name).group(1).split(",")
       except: pass
     else: 
       for param in potentials:

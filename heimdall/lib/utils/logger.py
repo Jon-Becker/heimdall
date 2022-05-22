@@ -1,9 +1,35 @@
+import os
+import pathlib
 import datetime
+import re
 from alive_progress import alive_it
 
 from .colors import colorLib
 
-def log(type, message):
+global logfile
+logfile = f'{pathlib.Path(__file__).parent.parent.parent.resolve()}/logs/heimdall-{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}.log'
+
+def initLogfile(command):
+  logStripColor(logfile , "info", " ".join(command))
+
+def logStripColor(file, type, log):
+  with open(file,'a') as f:
+    f.write(re.sub(r'(\\033|)\[\d*m', '', "{} {}\n".format(get_prefix(type), log)))
+
+def logTraceback(error, silent=False):
+  traceback = error.strip().split("\n")
+  errorLogString = f'Execution excepted: {traceback[-1]}'
+  tracebackFiles = []
+  for file in (traceback):
+    if "File \"/" in file:
+      tracebackFiles.append("".join(", ".join(file.split(", ")[0:2]).split('"')[1:]))
+  
+  for i, file in enumerate(tracebackFiles):
+    errorLogString += f'\n{" "*29}{"├" if i+1 < len(tracebackFiles) else "└"}─({colorLib.RED}{i}{colorLib.RESET}) {file}'
+  
+  log("critical", errorLogString, silent)
+
+def log(type, message, silent=False):
   if(type == "warning"):
     accent = colorLib.YELLOW
   elif(type == "critical"):
@@ -14,8 +40,10 @@ def log(type, message):
     accent = colorLib.GREEN + colorLib.BOLD
   else:
     accent = colorLib.CYAN
-
-  print(datetime.datetime.now().strftime(f'[{accent}%H:%M:%S.%f{colorLib.RESET}] [{accent}{type.upper()}{colorLib.RESET}] {message}'))
+  if not silent:
+    print(datetime.datetime.now().strftime(f'[{accent}%H:%M:%S.%f{colorLib.RESET}] [{accent}{type.upper()}{colorLib.RESET}] {message}'))
+    
+  logStripColor(logfile, type, message)
 
 def query(type, default, message):
   if(type == "warning"):

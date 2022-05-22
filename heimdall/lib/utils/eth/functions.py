@@ -10,7 +10,7 @@ from bidict import bidict
 from ...config import loadFileAsPickle
 from ..apis.sigdir import resolve
 
-from ..logger import log, progress_bar
+from ..logger import log, logTraceback, progress_bar, logfile
 from ..io import makePath, outputDirectory, write, pathExists, writeObj
 from ..colors import colorLib
 from ..eth.classes.vm import VirtualMachine
@@ -36,8 +36,7 @@ def findSignatures(assembly, trace, args):
 def resolveFunctions(assembly, args, output):
   try:
     functions = []
-    if args.verbose:
-      log('info', f'Tracing EVM to determine function signatures...')
+    log('info', f'Tracing EVM to determine function signatures...', not args.verbose)
 
     dispatcher = VirtualMachine(_assembly=assembly)
     dispatcherTrace = dispatcher.trace()
@@ -45,11 +44,11 @@ def resolveFunctions(assembly, args, output):
     indicesDict = {}
     potentialDict = {}
 
-    if args.verbose:
-      log('info', f'Found {colorLib.CYAN}{len(signatures)}{colorLib.RESET} unique signatures. Parsing functions...')
-      log('info', f'Determining function entry points and resolving signatures...')
+    log('info', f'Found {colorLib.CYAN}{len(signatures)}{colorLib.RESET} unique signatures. Parsing functions...', not args.verbose)
+    log('info', f'Determining function entry points and resolving signatures...', not args.verbose)
   except:
-    log('critical', f'Tracing EVM failed! Verbose logs saved to {colorLib.CYAN}{output.replace(os.getcwd(), ".")}/{datetime.date.today().strftime("%m-%d-%Y")}.log{colorLib.RESET}')
+    log('critical', f'Tracing EVM failed! Advanced logs available at {colorLib.RED + colorLib.UNDERLINE + logfile + colorLib.RESET}.')
+    logTraceback(traceback.format_exc(), True)
     return
 
   if args.flush or args.ignore_cache or not pathExists(f'{output}/__cache__/indices.hc') or not pathExists(f'{output}/__cache__/signatures.hc'):
@@ -62,8 +61,7 @@ def resolveFunctions(assembly, args, output):
     writeObj(f'{output}/__cache__/indices.hc', indicesDict)
     writeObj(f'{output}/__cache__/signatures.hc', potentialDict)
   else:
-    if args.verbose:
-      log('info', 'Loaded signatures from cache!')
+    log('info', 'Loaded signatures from cache!', not args.verbose)
     indicesDict = loadFileAsPickle(f'{output}/__cache__/indices.hc')
     potentialDict = loadFileAsPickle(f'{output}/__cache__/signatures.hc')
 
@@ -71,8 +69,7 @@ def resolveFunctions(assembly, args, output):
   events = []
   mappings = []
 
-  if args.verbose:
-    log('info', f'Determining function parameters, views, and returns...')
+  log('info', f'Determining function parameters, views, and returns...', not args.verbose)
   for sig in progress_bar(signatures, args):
     try:
       function = Function(args, sig, assembly, endDispatcher, indices.inverse[sig], indices, potentialDict[sig])
@@ -80,49 +77,47 @@ def resolveFunctions(assembly, args, output):
     except KeyError as e:
       pass
     except Exception as e:
-      if args.verbose:
-        traceback.print_exc()
-        log('info', f'Ignoring signature {colorLib.CYAN}{hex(sig)}{colorLib.RESET}. Trace execution excepted!')
-    
-  if args.verbose:
-    functionLogString = f'Determined return, typing, and parameters.';
+      log('info', f'Ignoring signature {colorLib.CYAN}{hex(sig)}{colorLib.RESET}. Trace execution excepted!', not args.verbose)
+      logTraceback(traceback.format_exc(), True)
 
-    for i, f in enumerate(functions):
-      #TODO: these can be made into any() funcs
-      for event in f.events:
-        unique = True
-        for e in events:
-          if e['signature'] == event['signature']:
-            unique = False
-            break
-            
-        if unique:
-          events.append(event)
+  functionLogString = f'Determined return, typing, and parameters.'
+
+  for i, f in enumerate(functions):
+    #TODO: these can be made into any() funcs
+    for event in f.events:
+      unique = True
+      for e in events:
+        if e['signature'] == event['signature']:
+          unique = False
+          break
           
-      for mapping in f.mappings:
-        unique = True
-        for map in mappings:
-          if map['slot'] == f.mappings[mapping]['slot']:
-            unique = False
-            break
-            
+      if unique:
+        events.append(event)
         
-        if unique:
-          mappings.append(f.mappings[mapping])
+    for mapping in f.mappings:
+      unique = True
+      for map in mappings:
+        if map['slot'] == f.mappings[mapping]['slot']:
+          unique = False
+          break
+          
       
-      functionLogString += (f'\n{" "*25}{"├" if i+1 < len(functions) else "└"}─({colorLib.CYAN}{i}{colorLib.RESET}) '
-          f'{colorLib.CYAN}{f.name}{f.params} '
-          f'{colorLib.RESET}{"external " if f.external else "public "}'
-          f'{colorLib.RESET}{"" if f.external else "pure " if f.pure else "view " if f.view else ""}'
-          f'{colorLib.RESET}{"payable " if f.payable else ""}'
-          f'{f"returns({f.returns})" if f.returns else ""}'
-         )
-    log('info', functionLogString)
+      if unique:
+        mappings.append(f.mappings[mapping])
     
-    if all(func.view == True for func in functions):
-      log('warning', 'No non-view functions found. Is this a proxy contract?')
+    functionLogString += (f'\n{" "*25}{"├" if i+1 < len(functions) else "└"}─({colorLib.CYAN}{i}{colorLib.RESET}) '
+        f'{colorLib.CYAN}{f.name}{f.params} '
+        f'{colorLib.RESET}{"external " if f.external else "public "}'
+        f'{colorLib.RESET}{"" if f.external else "pure " if f.pure else "view " if f.view else ""}'
+        f'{colorLib.RESET}{"payable " if f.payable else ""}'
+        f'{f"returns({f.returns})" if f.returns else ""}'
+        )
+  log('info', functionLogString, not args.verbose)
+  
+  if all(func.view == True for func in functions):
+    log('warning', 'No non-view functions found. Is this a proxy contract?', not args.verbose)
 
-    log('info', f'Found {colorLib.CYAN}{len(events)}{colorLib.RESET} unique events. Resolving signatures...')
+  log('info', f'Found {colorLib.CYAN}{len(events)}{colorLib.RESET} unique events. Resolving signatures...', not args.verbose)
   
   if args.flush or args.ignore_cache or not pathExists(f'{output}/__cache__/events.hc'):
     eventDict = {}
@@ -139,8 +134,7 @@ def resolveFunctions(assembly, args, output):
         
     writeObj(f'{output}/__cache__/events.hc', eventDict)
     
-    if args.verbose:
-      log('info', f'Resolved signature names.')
+    log('info', f'Resolved signature names.', not args.verbose)
   else:
     eventDict = loadFileAsPickle(f'{output}/__cache__/events.hc')
   

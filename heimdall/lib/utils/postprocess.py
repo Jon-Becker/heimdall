@@ -1,6 +1,8 @@
 import re
 import traceback
 
+from heimdall.lib.utils.logger import logTraceback
+
 from .logic import Logic
 
 
@@ -62,8 +64,8 @@ def postProcess(_line, signatures, events, constantStorage):
         
         cleaned = cleaned.replace(casting[i], temp)
     except:
-      pass
+      logTraceback(traceback.format_exc(), True)
   except Exception as e:
-    pass
+    logTraceback(traceback.format_exc(), True)
   return cleaned
 

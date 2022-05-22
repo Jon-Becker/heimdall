@@ -15,10 +15,7 @@ pip install eth-heimdall
 Heimdall operates off the ``argparse`` library, with modules specifying which operation you with to perform.
 
 ```
-Usage: heimdall [-m/--module] MODULE [-t/--target] VALUE [-o path] [-n value]
-                                     [-p value] [-p value] [--redeploy]
-                                     [--beautify] [--version] [--update]
-                                     [-v] [-h] [--redeploy] [--beautify]
+heimdall [-m/--module] MODULE [-v] [--default] [-arguments]
 ```
 
 ## Modules & Help
@@ -38,7 +35,8 @@ Options:
 
         #  |       Name  |                                           Description    
            |             |                                                      
-        0  |  Decompile  |      Decompile and download the target smart contract
+        0  |     Config  |       Easily modify the configuration on Heimdall
+        1  |  Decompile  |  Decompile and download the target smart contract
 
   Parameters:
     -m MODULE, --module MODULE        Operation module, either name or number from list
@@ -49,6 +47,7 @@ Options:
     -p URL, --provider URL            URL of custom Ethereum provider
 
   Additional:
+    --open, --edit                    Attempts to open nano / edit on the operation
     --redeploy ID                     Redeploys the contract from -n onto ID
     --beautify                        Attempts to beautify the downloaded contract using
                                         statistical renaming and spacing
@@ -64,6 +63,7 @@ Specific module documentation can be found in the ``/docs`` folder, or quickly n
 
 | Module Name | Description | Documentation URL |
 | ----------- | ----------- | ----------------- |
+| Config      | Heimdall Configuration Module | [Documentation](https://github.com/Jon-Becker/heimdall/blob/main/docs/config.md)
 | Decompile   | Decompiles EVM bytecode > Solidity | [Documentation](https://github.com/Jon-Becker/heimdall/blob/main/docs/decompile.md)
 
 ## Configuration

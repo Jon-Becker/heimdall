@@ -6,3 +6,4 @@ dist
 dist/*
 eth_heimdall.egg-info
 eth_heimdall.egg-info/*
+heimdall-*.log

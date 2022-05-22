@@ -13,6 +13,7 @@ setup(name='eth_heimdall',
       packages=[
         'heimdall',
         'heimdall/lib',
+        'heimdall/logs',
         'heimdall/lib/menus',
         'heimdall/lib/modules',
         'heimdall/env',

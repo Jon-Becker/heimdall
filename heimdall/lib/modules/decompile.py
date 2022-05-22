@@ -29,23 +29,22 @@ def main(args):
       if not args.provider:
         args.provider = getConfig()['defaults']['providers']['remote']
         log('warning', f'Provider not set! Using default remote provider from configuration.')
-        
-        log('info', 'Establishing connection to provider...')
+       
+      log('info', 'Establishing connection to provider...')
+      if "http" in args.provider.lower():
+        web3 = Web3(Web3.HTTPProvider(args.provider, request_kwargs={'timeout': 3}))
+      elif "wss" in args.provider.lower():
+        web3 = Web3(Web3.WebsocketProvider(args.provider, request_kwargs={'timeout': 3}))
       else:
-        if "http" in args.provider.lower():
-          web3 = Web3(Web3.HTTPProvider(args.provider, request_kwargs={'timeout': 3}))
-        elif "wss" in args.provider.lower():
-          web3 = Web3(Web3.WebsocketProvider(args.provider, request_kwargs={'timeout': 3}))
-        else:
-          log('critical', f'Provider {colorLib.RED}{args.provider}{colorLib.RESET} doesn\'t seem valid.')
-          return
+        log('critical', f'Provider {colorLib.RED}{args.provider}{colorLib.RESET} doesn\'t seem valid.')
+        return
 
-        if web3.isConnected():
-          log('success', 'Connection established!')
-        else:
-          log('warn', f'Connection to {colorLib.YELLOW}{args.provider}{colorLib.RESET} failed!')
-          web3 = Web3()
-          return
+      if web3.isConnected():
+        log('success', 'Connection established!')
+      else:
+        log('warn', f'Connection to {colorLib.YELLOW}{args.provider}{colorLib.RESET} failed!')
+        web3 = Web3()
+        return
       
       log('info', f'Fetching target {colorLib.CYAN}{target}{colorLib.RESET}...')
       if not 'eth' in target:
@@ -86,8 +85,7 @@ def main(args):
       assembly = disassemble(bytecode, output, args)
       version = detectVersion(assembly, args)
       
-      if args.verbose:
-          log('info', f'Assembly heuristics suggest {colorLib.CYAN}{resolve(version[0][0])} <= EVM < {resolve(version[1][0])}{colorLib.RESET} and {colorLib.CYAN}Solidity >= {version[0][1]}{colorLib.RESET}.')
+      log('info', f'Assembly heuristics suggest {colorLib.CYAN}{resolve(version[0][0])} <= EVM < {resolve(version[1][0])}{colorLib.RESET} and {colorLib.CYAN}Solidity >= {version[0][1]}{colorLib.RESET}.', not args.verbose)
       
       if version[0][0] < 2:
         log('warning', f'Heimdall currently only has support for EVM versions after Constantinople. This contract may not decompile correctly.')

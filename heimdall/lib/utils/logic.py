@@ -13,6 +13,7 @@ from bidict import bidict
 from eth_abi import decode_abi
 from re import L, M
 from Crypto.Hash import keccak
+from heimdall.lib.utils.logger import logTraceback
 sha3 = lambda x: keccak.new(digest_bits=256, data=x).digest()
 
 from .eth.opdict import opcodeDict, opArgNs, _offsetToMemoryName
@@ -158,8 +159,7 @@ def solidify_wrapped(_wrapped, vm, func=None):
     
     _ret = solidity_operation(args, vm, func)
   except Exception as e:
-    # TODO: log these, its important because it fucks with the logic.
-    pass
+    logTraceback(traceback.format_exc(), True)
 
   return _ret
     

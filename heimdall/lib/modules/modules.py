@@ -2,9 +2,10 @@ import os
 import importlib
 import pathlib
 from struct import pack
+import traceback
 
 from ..utils.colors import colorLib
-from ..utils.logger import log
+from ..utils.logger import log, logTraceback
 
 def getModules(args=None):
   mods = []
@@ -23,10 +24,5 @@ def getModules(args=None):
         mods.append(meta)
       except Exception as e:
         log('warning', f'Module {colorLib.YELLOW}{item}{colorLib.RESET} failed to mount!')
-        if args and args.verbose:
-          log('warning', f'├─ {colorLib.YELLOW}{e.msg}{colorLib.RESET}')
-          try:
-            log('warning', f'└─({colorLib.GREY}{e.path}{colorLib.RESET})')
-          except:
-            pass
+        logTraceback(traceback.format_exc(), not args.verbose)
   return (mods, max_title_length, max_description_length)

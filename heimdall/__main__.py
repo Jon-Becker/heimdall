@@ -4,6 +4,7 @@ from inspect import trace
 import os
 import sys
 import importlib
+import platform
 import traceback
 
 
@@ -13,7 +14,7 @@ from .lib.modules.modules import getModules
 from .lib.utils.colors import colorLib
 from .lib.menus.header import getHeader
 from .lib.menus.help import getHelp
-from .lib.utils.logger import log
+from .lib.utils.logger import initLogfile, log, logTraceback, logfile
 from .lib.utils.version import getRemoteVersion, getLocalVersion
 
 def main(argv=None):
@@ -48,10 +49,15 @@ def main(argv=None):
   heimdall.add_argument('--open', '--edit', help="Attempts to open nano / edit on the operation", action="store_true")  
 
   args = heimdall.parse_args()
+
+  log('debug', " ".join(sys.argv), True)
+  log('debug', f'Heimdall Version: {getLocalVersion()}', True)
+  log('debug', f'Machine: {" ".join(os.uname().version.split(" ")[0:4])} {os.uname().version.split(" ")[11]}', True)
+  
   try:
     if args.help:
       print(getHelp())
-
+    
     else:
       if args.module:
         handled = False
@@ -62,20 +68,22 @@ def main(argv=None):
           selected_module = importlib.import_module(available_modules[0][int(args.module)]['import'], package='heimdall')
           handled = True
           try:
+            log('debug', f'{selected_module.meta["title"]} module version: {selected_module.meta["version"]}', True)
             selected_module.main(args)
           except Exception as e:
-            traceback.print_exc()
-            log('critical', f'Execution failed! Advanced logs available.')
+            logTraceback(traceback.format_exc())
+            log('critical', f'Execution failed! Advanced logs available at {colorLib.RED + colorLib.UNDERLINE + logfile + colorLib.RESET}.')
         else:
           for module in available_modules[0]:
             if args.module.lower() == module["title"].lower():
               selected_module = importlib.import_module(module['import'], package='heimdall')
               handled = True
               try:
+                log('debug', f'{selected_module.meta["title"]} module version: {selected_module.meta["version"]}', True)
                 selected_module.main(args)
               except Exception as e:
-                traceback.print_exc()
-                log('critical', f'Execution failed! Advanced logs available.')
+                logTraceback(traceback.format_exc())
+                log('critical', f'Execution failed! Advanced logs available at {colorLib.RED + colorLib.UNDERLINE + logfile + colorLib.RESET}.')
           
           if not handled:
             print(f'heimdall: error: Module {colorLib.YELLOW}{args.module}{colorLib.RESET} not found. Use -h to show the help menu.\n')

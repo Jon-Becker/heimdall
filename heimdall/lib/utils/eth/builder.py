@@ -26,8 +26,7 @@ def build(assembly, args, output, web3, onlyAbi=False):
     sourcefile = f'{output}/decompiled.sol'
     indent_level = 0
     
-    if args.verbose:
-      log('info', f'Creating source file {colorLib.CYAN}{sourcefile.replace(os.getcwd(), ".")}{colorLib.RESET}')
+    log('info', f'Creating source file {colorLib.CYAN}{sourcefile.replace(os.getcwd(), ".")}{colorLib.RESET}', not args.verbose)
     
     source_header = f'''// SPDX-License-Identifier: MIT
 pragma solidity {getLatestSolidityRelease()};
