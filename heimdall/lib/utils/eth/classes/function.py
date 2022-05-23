@@ -213,11 +213,6 @@ class Function():
                   if call['opcode'] == 'JUMPI' and call['wrapped'][1][0] :
                     revert_reason = solidify_wrapped(call["wrapped"][1], vm, self)
                     
-                    # some hardcoded revert reasons being filtered out
-                    #
-                    # require((msg.value) == 0);
-                    # require((msg.data.length - 4 < argcount*32) == 0);
-                    
                     if revert_reason == '(msg.value) == 0':
                       self.payable = False
                       
