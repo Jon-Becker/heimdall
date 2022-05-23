@@ -115,15 +115,27 @@ class Function():
 
             else:
               callParameters = call['inputs']
-              if call['opcode'] in ['CALL', 'CALLCODE']:
-                callParameters.pop(2)
+              # if delegatecall or staticcall, insert an empty value field
+              if call['opcode'] in ('STATICCALL', 'DELEGATECALL'):
+                callParameters.insert(2, 0)
+                
+              # I'm sorry this is extremely ugly, we just have to actually parse these 
+              # callParameters into a solidity staticcall, and I dont want a massive fstring
+              # so I broke it up a bit into parts
+              source = solidify_wrapped(call['wrapped'][1], vm, self)
+              try:
+                [self.logic.append([call['pc'], f'bytes memory {source} = {self.memory[source]["value"]};']) for source in sources if re.match(r"var[0-9]*", source)]
+              except: pass
               
-              #print(callParameters)
-              self.logic.append([call['pc'] ,f'(bool success, bytes{callParameters[-1]} memory ext0) = address({Web3.toChecksumAddress(Logic.padHex(None, callParameters[1], 40))}).staticcall();'])
+              self.logic.append([call['pc'] ,(
+                f'(bool success, bytes{callParameters[6]} memory {offsetToMemoryName(callParameters[5])}) =' 
+                f' address({source}).staticcall'
+                f'({offsetToMemoryName(callParameters[3])});'
+              )])
               
               self.view = False
 
-          if call['opcode'] in ['DELEGATECALL', 'STATICCALL', 'CALL', ]:
+          if call['opcode'] in ['DELEGATECALL', 'STATICCALL', 'CALL']:
             self.external = True
 
           if call['opcode'] in ['MSTORE', 'MSTORE8']:
@@ -168,7 +180,7 @@ class Function():
               
           if code['opcode']['name'] == "JUMPI":
             if call['inputs']:
-              jumpdest = call['inputs'][0]                
+              jumpdest = call['inputs'][0]
               if call['inputs'][1] == 1 and next not in handled:
                 handled.append(next)
                 mapping += trace(calldata, next, deepcopy(vm.stack), stacktrace=[call], handled=handled)
@@ -199,12 +211,24 @@ class Function():
                 
                 for call in reversed(vm.stacktrace):
                   if call['opcode'] == 'JUMPI' and call['wrapped'][1][0] :
+                    revert_reason = solidify_wrapped(call["wrapped"][1], vm, self)
                     
-                    self.logic.append([call['pc'], f'require({solidify_wrapped(call["wrapped"][1], vm, self)}, "{revert_string}");'])
+                    # some hardcoded revert reasons being filtered out
+                    #
+                    # require((msg.value) == 0);
+                    # require((msg.data.length - 4 < argcount*32) == 0);
                     
+                    if revert_reason == '(msg.value) == 0':
+                      self.payable = False
+                      
+                    if any(reason in revert_reason for reason in ['arg', 'var', 'mapping', 'memory',]):
+                      if revert_string != "0":
+                        self.logic.append([call['pc'], f'require({revert_reason}, "{revert_string}");'])
+                      else:
+                        self.logic.append([call['pc'], f'require({revert_reason});'])
                     break
             except Exception as e:
-              pass
+              logTraceback(traceback.format_exc(), True)
           
           return mapping
         
@@ -281,7 +305,7 @@ class Function():
         
       if not self.args.default:
         logString += f'\n\n{" "*25}Select one of the above matches for this function [0]: '
-        selectionRaw = query('info', "0", logString)
+        selectionRaw = query('info', str(len(matches)), logString)
         if selectionRaw.isnumeric():
           selection = int(selectionRaw)
           if selection > len(matches)-1:

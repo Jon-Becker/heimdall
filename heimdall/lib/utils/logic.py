@@ -357,7 +357,10 @@ def determineType(func, retbytes):
 def commonTypes():
   return ('bytes', 'bytes[]', None)
 def bytesToType(type, retbytes):
-  return decode_abi(type, bytes.fromhex(retbytes[2:].replace('08c379a0', '')))
+  try:
+    return decode_abi(type, bytes.fromhex(retbytes[2:].replace('08c379a0', '')))
+  except:
+    return retbytes
 
 def offsetToMemoryName(offset, prefix=False):
   return _offsetToMemoryName(offset, prefix)

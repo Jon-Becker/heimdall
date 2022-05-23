@@ -11,8 +11,7 @@ import traceback
 
 from timeit import default_timer as timer
 
-from heimdall.lib.utils.io import checksum
-
+from .lib.utils.io import checksum
 from .lib.modules.modules import getModules
 from .lib.utils.colors import colorLib
 from .lib.menus.header import getHeader
