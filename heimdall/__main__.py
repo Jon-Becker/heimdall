@@ -1,23 +1,20 @@
-import argparse
-import datetime
-from inspect import trace
 import os
-import pathlib
 import sys
+import argparse
+import pathlib
+import datetime
 import importlib
-import platform
 import traceback
-
 
 from timeit import default_timer as timer
 
 from .lib.utils.io import checksum
-from .lib.modules.modules import getModules
+from .lib.menus.help import getHelp
 from .lib.utils.colors import colorLib
 from .lib.menus.header import getHeader
-from .lib.menus.help import getHelp
+from .lib.modules.modules import getModules
 from .lib.utils.logger import log, logTraceback, logfile
-from .lib.utils.version import getRemoteVersion, getLocalVersion
+from .lib.utils.version import getLocalVersion, checkVersionUpToDate, update
 
 def main(argv=None):
   command = 'clear'
@@ -26,11 +23,6 @@ def main(argv=None):
   os.system(command)
   print(getHeader())
   
-  if getRemoteVersion() != getLocalVersion():
-    log('alert', f'This version of Heimdall is outdated!')
-    log('alert', f'You can update to version {colorLib.GREEN}{getRemoteVersion()}{colorLib.RESET} by running: {colorLib.GREEN}pip install eth-heimdall --upgrade{colorLib.RESET} !')
-    print()
-
   heimdall = argparse.ArgumentParser(prog='heimdall', usage='heimdall [options]', add_help=False)
 
   heimdall.add_argument('-m', '--module', help="Operation module")
@@ -50,8 +42,16 @@ def main(argv=None):
   heimdall.add_argument('--ignore-cache', help="Ignores the cache (SLOWER!)", action="store_true")
   heimdall.add_argument('--open', '--edit', help="Attempts to open nano / edit on the operation", action="store_true")  
 
-  args = heimdall.parse_args()
+  (args, extras) = heimdall.parse_known_args()
 
+  for ext in extras:
+    try:
+      if '=' in ext:
+        args.__setattr__(ext.split('=')[0], ext.split('=')[1])
+      else:
+        args.__setattr__(ext, True)
+    except: pass
+  
   log('debug', " ".join(sys.argv), args.module != 'debug')
   log('debug', f'Machine: {" ".join(os.uname().version.split(" ")[0:4])} {os.uname().version.split(" ")[11]}', args.module != 'debug')
   log('debug', f'Checksum: {checksum(f"{pathlib.Path(__file__).parent.resolve()}/lib")}', args.module != 'debug')
@@ -90,7 +90,12 @@ def main(argv=None):
           
           if not handled:
             print(f'heimdall: error: Module {colorLib.YELLOW}{args.module}{colorLib.RESET} not found. Use -h to show the help menu.\n')
-
+        
+        version = checkVersionUpToDate()
+        if not version[0]:
+          log('alert', f'This version of Heimdall is outdated!')
+          update(version)
+              
         endTime = timer()
         log('info', f'Operation completed in {datetime.timedelta(seconds=(endTime-startTime))}.\n')
       else:

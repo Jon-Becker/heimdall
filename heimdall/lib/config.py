@@ -12,6 +12,7 @@ def getConfig():
       "build": {
         "version": "v1.0.2-stable"
       },
+      "autoupdate": False,
       "defaults": {
 
         "providers": {

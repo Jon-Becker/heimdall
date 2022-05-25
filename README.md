@@ -6,7 +6,7 @@
 Heimdall is an advanced and modular smart-contract toolkit which aims to make dealing with smart contracts on EVM based chains easier. 
 
 ## Installation & Usage
-![version badge](https://badge.fury.io/py/eth-heimdall.svg) ![download badge](https://static.pepy.tech/personalized-badge/eth-heimdall?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)
+![version badge](https://badge.fury.io/py/eth-heimdall.svg) ![download badge](https://static.pepy.tech/personalized-badge/eth-heimdall?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads) ![build badge](https://img.shields.io/badge/Build-Stable-g.svg) ![build badge](https://img.shields.io/badge/License-MIT-g.svg)
 ```
 pip install eth-heimdall
 ```

@@ -10,7 +10,7 @@ global logfile
 logfile = f'{pathlib.Path(__file__).parent.parent.parent.resolve()}/logs/heimdall-{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}.log'
 
 def logStripColor(file, type, log):
-  with open(file,'a') as f:
+  with open(file,'a', encoding='UTF-8') as f:
     f.write(re.sub(r'(\\033|)\[\d*m', '', "{} {}\n".format(get_prefix(type), log)))
 
 def logTraceback(error, silent=False):

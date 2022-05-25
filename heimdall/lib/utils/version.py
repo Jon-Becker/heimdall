@@ -1,8 +1,10 @@
+import json
 import pip_api
 import requests
-import json
 
 from ..config import *
+from .logger import log
+from .colors import colorLib
 
 def getRemoteVersion():
   releaseRequest = requests.get('https://pypi.python.org/pypi/eth-heimdall/json', timeout=3)
@@ -26,6 +28,24 @@ def getLatestSolidityRelease():
     return '>=0.8.0'
   except:
     return '>=0.8.0'
+  
+def checkVersionUpToDate():
+  remoteVersion = getRemoteVersion()
+  localVersion = getLocalVersion()
+  return (remoteVersion == localVersion, remoteVersion)
 
-def update():
-  pass
+def update(version):
+  config = getConfig()
+  if 'autoupdate' in config and config['autoupdate'] == True:
+    log('info', f'Installing latest version {colorLib.CYAN + version[1] + colorLib.RESET}...')
+    from subprocess import DEVNULL, STDOUT, check_call
+    
+    result = check_call(['python3', '-m', 'pip', 'install', 'eth-heimdall', '-U'], stdout=DEVNULL, stderr=STDOUT)
+
+    if checkVersionUpToDate()[0]:
+      log('success', f'Successfully updated to eth-heimdall {colorLib.GREEN + getLocalVersion() + colorLib.RESET}.')
+    else:
+      log('critical', 'Failed to install newest version of eth-heimdall from PIP!')
+  else:
+    log('alert', f'You can update to version {colorLib.GREEN}{version[1]}{colorLib.RESET} by running: {colorLib.GREEN}pip install eth-heimdall --upgrade{colorLib.RESET} !')
+    log('info', f'You can toggle autoupdates by running {colorLib.CYAN}heimdall -m config --toggle-autoupdate{colorLib.RESET}.')

@@ -1,3 +1,4 @@
+import json
 import os
 import hashlib
 import pickle
@@ -58,3 +59,10 @@ def checksum(directory, result=None):
       result = checksum(f'{directory}/{item}', result)
       
   return result
+
+def write_config_value_at_path(path, name, value):
+    with open(path, 'r') as f:
+        config = json.load(f)
+        config[name] = value
+    with open(path, 'w') as f:
+        json.dump(config, f, indent=4)
