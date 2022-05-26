@@ -23,7 +23,7 @@ def main(args):
     editFile = "n"
     log('info', 'Would you like to edit the configuration file? (y/N): N')
   
-  if args.__dict__['--toggle-autoupdate']:
+  if '--toggle-autoupdate' in args and args.__dict__['--toggle-autoupdate']:
     write_config_value_at_path(getConfigPath(), 'autoupdate', not getConfig()['autoupdate'])
     
     log('info', f"PyPi autoupdating is set to: {colorLib.CYAN}{'true' if getConfig()['autoupdate'] else 'false'}{colorLib.RESET}")

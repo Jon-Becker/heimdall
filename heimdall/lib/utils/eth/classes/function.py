@@ -299,17 +299,17 @@ class Function():
         logString += f'\n{" "*25}{"├" if i+1 < len(matches) else "└"}─({colorLib.CYAN}{i}{colorLib.RESET}) {colorLib.CYAN}{match}{colorLib.RESET}'
         
       if not self.args.default:
-        logString += f'\n\n{" "*25}Select one of the above matches for this function [0]: '
-        selectionRaw = query('info', str(len(matches)), logString)
+        logString += f'\n\n{" "*25}Select one of the above matches for this function [{len(matches)-1}]: '
+        selectionRaw = query('info', str(len(matches)-1), logString)
         if selectionRaw.isnumeric():
           selection = int(selectionRaw)
           if selection > len(matches)-1:
-            selection = 0
+            selection = len(matches)-1
         else:
-          selection = 0
+          selection = len(matches)-1
       else:
-        selection = 0
-        logString += f'\n\n{" "*25}Select one of the above matches for this function [0]: 0'
+        selection = len(matches)-1
+        logString += f'\n\n{" "*25}Select one of the above matches for this function [{len(matches)-1}]: {len(matches)-1}'
         log('info', logString)
       self.name = matches[selection]
     elif len(matches) > 0:

@@ -7,3 +7,4 @@ heimdall/lib/utils
 heimdall/lib/utils/apis
 heimdall/lib/utils/eth
 heimdall/lib/utils/eth/classes
+heimdall/logs

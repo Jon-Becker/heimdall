@@ -19,7 +19,9 @@ heimdall/lib/menus/header.py
 heimdall/lib/menus/help.py
 heimdall/lib/modules/__init__.py
 heimdall/lib/modules/config.py
+heimdall/lib/modules/debug.py
 heimdall/lib/modules/decompile.py
+heimdall/lib/modules/dist.json
 heimdall/lib/modules/modules.py
 heimdall/lib/utils/__init__.py
 heimdall/lib/utils/colors.py
@@ -42,3 +44,4 @@ heimdall/lib/utils/eth/classes/function.py
 heimdall/lib/utils/eth/classes/memory.py
 heimdall/lib/utils/eth/classes/stack.py
 heimdall/lib/utils/eth/classes/vm.py
+heimdall/logs/__init__.py
