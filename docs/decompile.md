@@ -22,6 +22,7 @@ heimdall -m decompile -t TARGET
 | -p       | --provider | NO       | URL      | URL of provider / node. Will default to config value if not present |
 | --default | N/A       | NO       | N/A      | Will automatically select default value when prompted during module execution |
 | --flush  | --ignore-cache | NO   | N/A      | Won't reuse cached values             |
+| --indent  | N/A | NO   | N/A      | Set the desired indent level for the decompiled contract             |
 
 ### Postprocessing Values
 

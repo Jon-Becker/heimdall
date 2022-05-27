@@ -2,16 +2,16 @@
     {
         "name": "Config",
         "version": "v1.0.0",
-        "checksum": "52ec2cc85a829c84d36d866c18291763"
+        "checksum": "b31acb4b1254ef7228cb027835b8e280"
     },
     {
         "name": "Debug",
         "version": "v1.0.0",
-        "checksum": "b3d4355fe26e66d056eabe59327458bc"
+        "checksum": "06f627f191730376008a1736889396f1"
     },
     {
         "name": "Decompile",
         "version": "v1.0.0",
-        "checksum": "644a462d96ded66657258abb1537f8c3"
+        "checksum": "cee97d7f8360624f8d9bdbf0ae69ffa5"
     }
 ]

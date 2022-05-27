@@ -45,7 +45,7 @@ def update(version):
     if checkVersionUpToDate()[0]:
       log('success', f'Successfully updated to eth-heimdall {colorLib.GREEN + getLocalVersion() + colorLib.RESET}.')
     else:
-      log('critical', 'Failed to install newest version of eth-heimdall from PIP!')
+      log('critical', 'Failed to install newest version of eth-heimdall from PyPi!')
   else:
     log('alert', f'You can update to version {colorLib.GREEN}{version[1]}{colorLib.RESET} by running: {colorLib.GREEN}pip install eth-heimdall --upgrade{colorLib.RESET} !')
     log('info', f'You can toggle autoupdates by running {colorLib.CYAN}heimdall -m config --toggle-autoupdate{colorLib.RESET}.')

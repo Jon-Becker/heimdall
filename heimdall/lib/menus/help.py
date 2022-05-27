@@ -5,6 +5,7 @@ from ..modules.modules import getModules
 from ..utils.colors import colorLib
 from ..utils.version import getLocalVersion
 
+# returns the heimdall help menu
 def getHelp():
   
   modules = []
@@ -17,7 +18,7 @@ def getHelp():
     modules.append(f'{str(len(modules)-2).rjust(9)}  |{item["title"].rjust(fetched_modules[1]+2)}  |{item["description"].rjust(fetched_modules[2]+2)}')
   
   return (
-    f'''Usage: {colorLib.BOLD}heimdall [-m/--module] MODULE [-v] [--default] [-arguments]{colorLib.RESET}
+    f'''Usage: {colorLib.BOLD}heimdall MODULE [-v] [--default] [-arguments]{colorLib.RESET}
 
 Powerful Ethereum smart contract toolkit for forensics, manipulation, and research.
 
@@ -42,6 +43,7 @@ Options:
     -p URL, --provider URL            URL of custom Ethereum provider
 
   Additional:
+    --indent LEVEL                    Sets the indent level for output files (Default 2)
     --open, --edit                    Attempts to open nano / edit on the operation
     --redeploy ID                     Redeploys the contract from -n onto ID
     --beautify                        Attempts to beautify the downloaded contract using

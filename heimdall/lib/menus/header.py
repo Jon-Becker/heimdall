@@ -1,6 +1,7 @@
 from ..utils.colors import colorLib
 from ..utils.version import getLocalVersion
 
+# returns the heimdall global header
 def getHeader():
   return (
     f'''{colorLib.BLUE}

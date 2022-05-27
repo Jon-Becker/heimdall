@@ -7,12 +7,13 @@ from .logic import Logic
 
 
 def postProcess(_line, signatures, events, constantStorage):
-  # Cleaning up SHL that don't actually do anything
+  
+  # cleaning up SHL that don't actually do anything
   _line = _line.replace(r' << 1 - 1', '')
   try:
     cleaned = _line
     
-    # Replace all Event_0x00000000 with resolved event name
+    # replace all Event_0x00000000 with resolved event name
     eventPlaceholder = re.findall(r'Event_0x[a-fA-F0-9]{8}', cleaned, re.IGNORECASE)
     if len(eventPlaceholder) >= 1:
       placeholderSignature = eventPlaceholder[0][6:16]
@@ -20,7 +21,7 @@ def postProcess(_line, signatures, events, constantStorage):
         if eventSignature.startswith(placeholderSignature):
           cleaned = cleaned.replace(eventPlaceholder[0], events[eventSignature]['name'])
     
-    # Replace all constant SLOADS with their names
+    # replace all constant SLOADS with their names
     storage = re.findall(r'LOAD\{[0-9]{0,3}\}', cleaned, re.IGNORECASE)
     for i, access in enumerate(storage):
       access = access.replace("LOAD{", "").replace("}", "")
@@ -34,7 +35,7 @@ def postProcess(_line, signatures, events, constantStorage):
         cleaned = cleaned.replace(storage[i], f'storage[{access}]')
         
     
-      # Replace all masks with type casting
+      # replace all masks with type casting
       casting = re.findall(r'MASK{.*?}', cleaned, re.IGNORECASE)
       for i, cast in enumerate(casting):
         try:

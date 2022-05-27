@@ -16,38 +16,45 @@ from Crypto.Hash import keccak
 from heimdall.lib.utils.logger import logTraceback
 sha3 = lambda x: keccak.new(digest_bits=256, data=x).digest()
 
-from .eth.opdict import opcodeDict, opArgNs, _offsetToMemoryName
+from .eth.opdict import opcodeDict, opArgNs
 
 class Logic:
   def __init__(self):
+    # set constants
     self.UINT256_MAX = 2 ** 256 - 1
     self.UINT255_MAX = 2 ** 255 - 1
     self.UINT256_CEILING = 2 ** 256
     self.UINT255_CEILING = 2 ** 255
 
+  # safely sign an unsigned int
   def sign(self, unsigned):
     if ( unsigned & (1 << (255))) != 0:
       unsigned = unsigned - (1 << 256)
     return unsigned
   
+  # safe add
   def add(self, a, b):
     return ((a + b) & self.UINT256_MAX)
 
+  # safe multiplication
   def mul(self, a, b):
     if a == 0 or b == 0:
       return 0
     return ((a * b) & self.UINT256_MAX)
 
+  # safe subtraction
   def sub(self, a, b):
     if a == b:
       return 0
     return ((b - a) & self.UINT256_MAX)
 
+  # safe division
   def div(self, a, b):
     if a == 0 or b == 0:
       return 0
     return ((b // a) & self.UINT256_MAX)
 
+  # safe signed division
   def sdiv(self, a, b):
     if a == 0 or b == 0:
       return 0
@@ -56,30 +63,34 @@ class Logic:
     flip = -1 if a * b < 0 else 1
     return flip * (abs(b) // abs(a))
 
+  # safe modulo
   def mod(self, a, b):
     if a == 0:
       return 0
     return (b % a)
 
+  # safe signed modulo
   def smod(self, a, b):
     a = self.sign(a)
     b = self.sign(b)
     flip = -1 if a < 0 else 1
-
     if a == 0:
       return 0
     return ( flip * (abs(b) % abs(a))) & self.UINT256_MAX
 
+  # safe addmod operation
   def addmod(self, a, b, c):
     if a == 0:
       return 0
     return ( b + c ) % a
 
+  # safe mulmod operation
   def mulmod(self, a, b, c):
     if a == 0:
       return 0
     return ( b * c ) % a
 
+  # safe exponentiation op
   def exp(self, a, b):
     if a == 0:
       return 1
@@ -87,6 +98,7 @@ class Logic:
       return 0
     return pow(b, a, self.UINT256_CEILING)
 
+  # pad a hex with null bytes to the given length
   def padHex(self, given_int, given_len):
       hex_result = hex(given_int)[2:]
       num_hex_chars = len(hex_result)
@@ -97,18 +109,21 @@ class Logic:
               '0x' + extra_zeros + hex_result if num_hex_chars < given_len else
               None)
   
+  # calculate the least significant bit of a number
   def leastSignificantByte(self, value):
     if ( len(hex(value)) % 2 == 0 ) and ( value > 0 ):
       hexval = hex(value)
       return int(hexval[-2:],16)
     return 0
 
+  # calculate the byte size of a value
   def byteSize(self, value):
     try:
       return math.ceil(len(hex(value)[2:])/2)
     except:
       return 0
-    
+  
+  # convert a mask argument into a solidity type
   def resolveMask(args):
     arg = args['val']
     isPointer = args['isPointer']
@@ -130,16 +145,19 @@ class Logic:
     if arg % 2 == 0:
       bytesize = math.floor( ((arg/8)) )
       ret += [f"bytes{bytesize}", f"bytes{32-bytesize}", f"bytes"]
-      
+    
+    # if this is used as a pointer, it could be an array
     if isPointer:
       ret += [ f"{potential}[]" for potential in ret]
     return ret
 
+# convert a wrapepd stack value into a solidity logic line
 def solidify_wrapped(_wrapped, vm, func=None):
   _ret = 'true'
   try:
     args = []
 
+    # unwrap the value recursively
     def unwrap(_arg, args):
       if _match(_arg, (None, int, str)) or _match(_arg, (int, int, str)) or _match(_arg, (str, int, str)):
         if "PUSH" in _arg[2]:
@@ -154,17 +172,18 @@ def solidify_wrapped(_wrapped, vm, func=None):
             unwrap(arg, args)
           elif type(arg) == str:
             args.append(arg)
-    
     unwrap(_wrapped, args)
     
+    # convert the unwrapped values into a solidity line
     _ret = solidity_operation(args, vm, func)
+    
   except Exception as e:
     logTraceback(traceback.format_exc(), True)
 
   return _ret
     
+# converts a list of unwrapped stack values into solidity by iterating over them to determine their solidity counterpart
 def solidity_operation(_op, vm, func):
-  _ret = ""
   operations = list(reversed(_op))
   while any(isinstance(op, (str,)) and op.lower() in opcodeDict.inverse for op in operations):
     for i, operation in enumerate(operations):
@@ -176,13 +195,13 @@ def solidity_operation(_op, vm, func):
         [solidified, mem, mappings] = solidify(operation, vm, func, *opArgs)
         operations.insert(i-opArgN, solidified)
         break
-  # there CAN be multipme operations[] so yeah
   return operations[0]
 
 
 def solidify(opcode, vm, func, *_args, mem={}, mappings={}):
   args = list(_args) + [None for x in range(7)]
   
+  # if we run a keccak, save the value to a memory location for later use in mapping calculation
   if opcode == "SHA3":
     _rets = []
     mem['raw'] = sha3(vm.memory.read(0, 64)).hex()
@@ -194,9 +213,11 @@ def solidify(opcode, vm, func, *_args, mem={}, mappings={}):
       }
     return (f'keccak256(abi.encodePacked({" + ".join(_rets)}))', mem, mappings)
   
+  # if we are loading from memory, we need to convert the offset into a memory name
   if opcode == "MLOAD":
     return (_offsetToMemoryName(args[0]), mem, mappings)
   
+  # if we are loading from storage and theres a keccak in the unwrapped stack, its most likely a mapping
   if opcode == "SLOAD" and any("keccak256" in str(arg) for arg in args):
     mappingSlot = int(mem[1]['value'], 16) if 1 in mem else 0
     if mappingSlot <= 32:
@@ -209,6 +230,8 @@ def solidify(opcode, vm, func, *_args, mem={}, mappings={}):
       return (f'_mapping_{m}[{func.memlast["var00"]["value"]}][{func.memory["var00"]["value"]}]', mem, mappings)
     else:
       return (f'_mapping_generic[{func.memlast["var00"]["value"]}][{func.memory["var00"]["value"]}]', mem, mappings)
+  
+  # constant solidity values for other opcodes
   solidified = {
     'ADD': f'{args[0]} + {args[1]}',
     'MUL': f'{args[0]} * {args[1]}',
@@ -268,17 +291,21 @@ def solidify(opcode, vm, func, *_args, mem={}, mappings={}):
   except Exception as e:
     return (opcode, mem, mappings)
   
+# resolves a slot to a mapping
 def resolveSlot(hex):
   for i in range(0, 0x20):
     if sha3(bytearray.fromhex(str(i).rjust(128, "0"))).hex() == hex:
       return i
   return False
 
+# checks if a any list is in a list
 def listContainsList(needleList, haystack):
   for needle in needleList:
     if needle in haystack:
       return True
   return False
+
+# a recursive match function which can match dynamic expressions to patterns
 def _match(expression, pattern):
   def _matcher(exp, pat, m):
     if isinstance(pat, str) and ":" in pat:
@@ -318,6 +345,8 @@ def _match(expression, pattern):
   except Exception as e:
     return False
   return match
+
+# determines the type of the given bytes, using length and decoding as heuristics
 def determineType(func, retbytes):
   determined = "bytes"
   try:
@@ -330,8 +359,8 @@ def determineType(func, retbytes):
     if len(return_words) > 1:
       determined = "string"
     else:
-      # its a single type, uint256, address, bool, or bytes32
       
+      # its a single type, uint256, address, bool, or bytes32
       if retbytes == '0x0000000000000000000000000000000000000000000000000000000000000000':
         if func != None:
           func.warnings.append(f'/// @custom:warning This function returns either a boolean, uint, bytes32, or address.')
@@ -354,13 +383,21 @@ def determineType(func, retbytes):
     pass
 
   return determined
+
+# some common types that we should override if possible
 def commonTypes():
   return ('bytes', 'bytes[]', None)
+
+# converting bytes to a given type, usually used for converting bytes to a string like revert reasons
 def bytesToType(type, retbytes):
   try:
     return decode_abi(type, bytes.fromhex(retbytes[2:].replace('08c379a0', '')))
   except:
     return retbytes
 
-def offsetToMemoryName(offset, prefix=False):
-  return _offsetToMemoryName(offset, prefix)
+# calculates a variable name from the offset provided
+def offsetToMemoryName(offset): 
+  try:
+    return f'var{hex(math.floor(offset/4))[2:].ljust(2, "0")}'
+  except:
+    return offset

@@ -14,7 +14,7 @@ pip install eth-heimdall
 Heimdall operates off the ``argparse`` library, with modules specifying which operation you with to perform.
 
 ```
-heimdall [-m/--module] MODULE [-v] [--default] [-arguments]
+heimdall MODULE [-v] [--default] [-arguments]
 ```
 
 ## Modules & Help

@@ -12,13 +12,16 @@ def fetchSourceCode(args, output, onlyAbi=False):
   log('info', 'Attempting to fetch source from EtherScan...')
   try:
     sourceRequest = requests.get(f'https://api.etherscan.io/api?module=contract&action=getsourcecode&address={args.target}')
+    
     if sourceRequest.status_code == 200:
-      sourceBody = json.loads(sourceRequest.text)
       
+      # parse the response
+      sourceBody = json.loads(sourceRequest.text)
       source = sourceBody['result'][0]['SourceCode'].replace("}}", "}", 1).replace("{{", "{", 1)
       abi = sourceBody['result'][0]['ABI']
+      
+      # write the abi to an output file
       log('info', f'Saving ABI file {colorLib.CYAN}{output.replace(os.getcwd(), ".")}/abi.json{colorLib.RESET}', not args.verbose)
-        
       try:
         abi = json.loads(abi)
         write(f'{output}/abi.json', json.dumps(abi, indent=2))
@@ -29,6 +32,7 @@ def fetchSourceCode(args, output, onlyAbi=False):
       if len(source) > 0:
         log('success', 'Found verified source on EtherScan!')
 
+        # compiler language detection
         sourceType = "Solidity"
         sourceExtension = "sol"
         if "vyper" in sourceBody['result'][0]['CompilerVersion'].lower():
@@ -36,6 +40,7 @@ def fetchSourceCode(args, output, onlyAbi=False):
           sourceExtension = "vy"
         log('info', f'Compiler language is {colorLib.CYAN}{sourceType}{colorLib.RESET}.', not args.verbose)
 
+        # multiple source files prokject
         if not onlyAbi:
           try:
             sourceObject = json.loads(source)
@@ -53,12 +58,14 @@ def fetchSourceCode(args, output, onlyAbi=False):
             except:
               log('critical', 'Fetching source excepted! Defaulting to assembly builder.')
               return False
-            
+          
+          # single source file project
           except:
             log('info', 'Single file source detected!', not args.verbose)
             write(f'{output}/source.{sourceExtension}', source)
             log('info', f'Saving source file {colorLib.CYAN}{output.replace(os.getcwd(), ".")}/source.{sourceExtension}{colorLib.RESET}')
-            
+          
+        # all checks passed, return the abi
         log('success', f'Successfully retrieved contract source from EtherScan. Output saved to {colorLib.GREEN}{output.replace(os.getcwd(), ".")}{colorLib.RESET}.')
         return abi
         
@@ -75,14 +82,23 @@ def fetchDeploymentBytecode(args, output):
   log('info', 'Attempting to fetch deployment bytecode from EtherScan...')
   try:
     sourceRequest = requests.get(f'https://api.etherscan.io/api?module=account&action=txlist&address={args.target}&startblock=0&endblock=99999999999&page=1&offset=1&sort=asc')
+    
     if sourceRequest.status_code == 200:
+      
+      # parse the response
       sourceBody = json.loads(sourceRequest.text)
+      
+      # some sort of error encountered
       if "NOT" in sourceBody['message']:
+        
+        # rate limited, wait 5 seconds
         if "rate limit" in sourceBody['result']:
           log('warning', 'Etherscan rate-limited! Sleeping for 5 seconds.', not args.verbose)
           time.sleep(5.01)
           return fetchDeploymentBytecode(args, output)
         else:
+          
+          # something else happened, return false
           log('critical', 'Couldn\'t fetch deployment bytecode from EtherScan.')
           return False
       else:

@@ -1,9 +1,11 @@
 from ..logic import listContainsList
 
+# resolve an integer to it's version name
 def resolve(int):
   versions = ['Homestead', 'Byzantium', 'Constantinople', 'Istanbul', 'London', 'ArrowGlacier']
   return versions[int]
 
+# detects the version of the compiler by looking at present opcodes and comparing them to the known versions
 def detectVersion(assembly, args):
   versions = ['Homestead', 'Byzantium', 'Constantinople', 'Istanbul', 'London', 'ArrowGlacier']
   assemblyFlat = [assembly[pc]['opcode']['name'] for pc in assembly]
@@ -21,7 +23,6 @@ def detectVersion(assembly, args):
   elif not listContainsList(['BASEFEE'], assemblyFlat): 
     min[0] = 3
     max[0] = 4
-  
   
   if listContainsList(['BASEFEE'], assemblyFlat):
     max[1] = '0.8.14'

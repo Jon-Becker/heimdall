@@ -11,13 +11,14 @@ def resolve(args, signature, type="signatures"):
     if sigRequest.status_code == 200:
       sigBody = json.loads(sigRequest.text)
       if len(sigBody['results']) > 0:
-
+        
+        # parse the returned signatures, there can be multiple so we need to store it in a potential list of resolved signatures.
         textSignatures = []
         for sig in sigBody['results']:
           textSignatures.append(sig["text_signature"])
 
         return textSignatures
-
+      
     else:
       return None
   except:

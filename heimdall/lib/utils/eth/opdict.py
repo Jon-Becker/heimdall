@@ -1,26 +1,6 @@
 import math
 from bidict import bidict
 
-class Opcode:
-  def __init__(self, query, *args):
-    if isinstance(query, (int,)):
-      self.int = query
-      self.hex = hex(query)
-      if query in opcodeDict:
-        self.opcode = opcodeDict[query].upper()
-      else:
-        self.opcode = 'unknown operation' 
-    else:
-      self.opcode = query.upper()
-      if query.lower() in opcodeDict.inverse:
-        self.int = opcodeDict.inverse[query.lower()]
-        self.hex = hex(self.int)
-      else:
-        self.opcode = 'unknown operation' 
-        self.hex = 0xFE
-        self.int = 254
-    
-    self.inputs = None if self.int not in opArgNs else opArgNs[self.int]
 opcodeDict = bidict({
   #
   # Stop and Arithmetic
@@ -376,9 +356,3 @@ opArgNs = {
   0xFE: 0,
   0xFF: 1,
 }
-
-def _offsetToMemoryName(offset, prefix=False): 
-  try:
-    return f'var{hex(math.floor(offset/4))[2:].ljust(2, "0")}'
-  except:
-    return offset

@@ -17,6 +17,7 @@ heimdall -m config
 | Argument | Alias      | Required | Variable | Description                           |
 | -------- | ---------- | -------- | -------- | ------------------------------------- |
 | -open    | --edit     | NO       | N/A      | Edit the config file from the command line |
+| --toggle-autoupdate    |      | NO       | N/A      | Toggle autoupdating on and off |
 
 ### About
 
