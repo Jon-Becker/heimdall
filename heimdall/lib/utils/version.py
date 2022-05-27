@@ -6,6 +6,7 @@ from ..config import *
 from .logger import log
 from .colors import colorLib
 
+# Gets the latest version of eth-heimdall from PyPi
 def getRemoteVersion():
   releaseRequest = requests.get('https://pypi.python.org/pypi/eth-heimdall/json', timeout=3)
   if releaseRequest.status_code == 200:
@@ -13,12 +14,14 @@ def getRemoteVersion():
     return str(latestVersionBody['info']['version'].strip())
   return getLocalVersion()
 
+# gets the local version of eth-heimdall
 def getLocalVersion():
   try:
     return str(pip_api.installed_distributions(local=False)['eth-heimdall'].version)
   except:
     return str(getConfig()['build']['version'])
   
+# gets the latest stable release of solidity from github
 def getLatestSolidityRelease():
   try:
     releaseRequest = requests.get('https://api.github.com/repos/ethereum/solidity/releases', timeout=3)
@@ -29,11 +32,13 @@ def getLatestSolidityRelease():
   except:
     return '>=0.8.0'
   
+# performs a check to see if local version == remote version
 def checkVersionUpToDate():
   remoteVersion = getRemoteVersion()
   localVersion = getLocalVersion()
   return (remoteVersion == localVersion, remoteVersion)
 
+# performs a silent update of eth-heimdall through pip
 def update(version):
   config = getConfig()
   if 'autoupdate' in config and config['autoupdate'] == True:

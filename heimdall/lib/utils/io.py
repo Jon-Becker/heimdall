@@ -78,3 +78,16 @@ def write_config_value_at_path(path, name, value):
         config[name] = value
     with open(path, 'w') as f:
         json.dump(config, f, indent=4)
+        
+        
+# load a file as  a json object
+def loadFileAsJson(path):
+  with open(path) as pathFile:
+    contents = json.loads("".join(pathFile.readlines()))
+  return contents
+
+# load a file as a pickle object
+def loadFileAsPickle(path):
+  with open(path, 'rb') as pathFile:
+    contents = pickle.load(pathFile)
+  return contents
