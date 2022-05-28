@@ -1,5 +1,6 @@
 import os
 import sys
+import platform
 import argparse
 import pathlib
 import datetime
@@ -57,7 +58,7 @@ def main(argv=None):
     args.__setattr__('module', extras[0])
   
   log('debug', " ".join(sys.argv), args.module != 'debug')
-  log('debug', f'Machine: {" ".join(os.uname().version.split(" ")[0:4])} {os.uname().version.split(" ")[11]}', args.module != 'debug')
+  log('debug', f'Uname: {platform.uname()}', args.module != 'debug')
   log('debug', f'Checksum: {checksum(f"{pathlib.Path(__file__).parent.resolve()}/lib")}', args.module != 'debug')
   log('debug', f'Heimdall Version: {getLocalVersion()}', args.module != 'debug')
   

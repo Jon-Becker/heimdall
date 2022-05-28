@@ -7,3 +7,4 @@ argparse
 argcomplete
 eth_abi
 pip-api
+platform
