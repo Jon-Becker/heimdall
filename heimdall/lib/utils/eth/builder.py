@@ -27,7 +27,7 @@ def build(assembly, args, output, web3, onlyAbi=False):
     indent_increment = 2 if not args.indent else int(args.indent)
     
     # write the header to the decompiled file
-    log('info', f'Creating source file {colorLib.CYAN}{sourcefile.replace(os.getcwd(), ".")}{colorLib.RESET}', not args.verbose)
+    log('info', f'Creating source file {colorLib.CYAN}{sourcefile.replace(os.getcwd(), ".")}{colorLib.RESET}', True)
     source_header = f'''// SPDX-License-Identifier: MIT
 pragma solidity {getLatestSolidityRelease()};
 

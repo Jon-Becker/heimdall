@@ -21,7 +21,7 @@ def fetchSourceCode(args, output, onlyAbi=False):
       abi = sourceBody['result'][0]['ABI']
       
       # write the abi to an output file
-      log('info', f'Saving ABI file {colorLib.CYAN}{output.replace(os.getcwd(), ".")}/abi.json{colorLib.RESET}', not args.verbose)
+      log('info', f'Saving ABI file {colorLib.CYAN}{output.replace(os.getcwd(), ".")}/abi.json{colorLib.RESET}', True)
       try:
         abi = json.loads(abi)
         write(f'{output}/abi.json', json.dumps(abi, indent=2))
@@ -38,17 +38,17 @@ def fetchSourceCode(args, output, onlyAbi=False):
         if "vyper" in sourceBody['result'][0]['CompilerVersion'].lower():
           sourceType = "Vyper"
           sourceExtension = "vy"
-        log('info', f'Compiler language is {colorLib.CYAN}{sourceType}{colorLib.RESET}.', not args.verbose)
+        log('info', f'Compiler language is {colorLib.CYAN}{sourceType}{colorLib.RESET}.', True)
 
         # multiple source files prokject
         if not onlyAbi:
           try:
             sourceObject = json.loads(source)
             try:
-              log('info', 'Multiple file source detected!', not args.verbose)
+              log('info', 'Multiple file source detected!', True)
               sourcePath = makePath(f'{output}/source/')
               for key in sourceObject['sources']:
-                log('info', f'Saving source file {colorLib.CYAN}{sourcePath.replace(os.getcwd(), ".")}{key}{colorLib.RESET}', not args.verbose)
+                log('info', f'Saving source file {colorLib.CYAN}{sourcePath.replace(os.getcwd(), ".")}{key}{colorLib.RESET}', True)
                 dirPath = key.split("/")
                 sourceName = dirPath.pop()
                 dirpath = f'{sourcePath}{"/".join(dirPath)}'
@@ -61,7 +61,7 @@ def fetchSourceCode(args, output, onlyAbi=False):
           
           # single source file project
           except:
-            log('info', 'Single file source detected!', not args.verbose)
+            log('info', 'Single file source detected!', True)
             write(f'{output}/source.{sourceExtension}', source)
             log('info', f'Saving source file {colorLib.CYAN}{output.replace(os.getcwd(), ".")}/source.{sourceExtension}{colorLib.RESET}')
           
@@ -93,7 +93,7 @@ def fetchDeploymentBytecode(args, output):
         
         # rate limited, wait 5 seconds
         if "rate limit" in sourceBody['result']:
-          log('warning', 'Etherscan rate-limited! Sleeping for 5 seconds.', not args.verbose)
+          log('warning', 'Etherscan rate-limited! Sleeping for 5 seconds.', True)
           time.sleep(5.01)
           return fetchDeploymentBytecode(args, output)
         else:

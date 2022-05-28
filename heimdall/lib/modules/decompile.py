@@ -89,7 +89,7 @@ def main(args):
       version = detectVersion(assembly, args)
       
       # log a warning if the version if unsupported
-      log('info', f'Assembly heuristics suggest {colorLib.CYAN}{resolve(version[0][0])} <= EVM < {resolve(version[1][0])}{colorLib.RESET} and {colorLib.CYAN}Solidity >= {version[0][1]}{colorLib.RESET}.', not args.verbose)
+      log('info', f'Assembly heuristics suggest {colorLib.CYAN}{resolve(version[0][0])} <= EVM < {resolve(version[1][0])}{colorLib.RESET} and {colorLib.CYAN}Solidity >= {version[0][1]}{colorLib.RESET}.', True)
       if version[0][0] < 2:
         log('warning', f'Heimdall currently only has support for EVM versions after Constantinople. This contract may not decompile correctly.')
         

@@ -1,19 +1,17 @@
-from encodings import utf_8
-import json
-import datetime
 import os
-import pickle
 import re
+import json
 import traceback
 
 from bidict import bidict
-from ..apis.sigdir import resolve
 
-from ..logger import log, logTraceback, progress_bar, logfile
 from ..io import *
 from ..colors import colorLib
+from ..apis.sigdir import resolve
 from ..eth.classes.vm import VirtualMachine
 from ..eth.classes.function import Function
+from ..logger import log, logTraceback, progress_bar, logfile
+
 
 # gets the history of a trace, -ith index
 def traceHistory(trace, _i=0):
@@ -43,7 +41,7 @@ def findSignatures(assembly, trace, args):
 def resolveFunctions(assembly, args, output):
   try:
     functions = []
-    log('info', f'Tracing EVM to determine function signatures...', not args.verbose)
+    log('info', f'Tracing EVM to determine function signatures...', True)
     
     # create a new VM instance with the disassembled target bytecode
     dispatcher = VirtualMachine(_assembly=assembly)
@@ -54,8 +52,8 @@ def resolveFunctions(assembly, args, output):
     indicesDict = {}
     potentialDict = {}
 
-    log('info', f'Found {colorLib.CYAN}{len(signatures)}{colorLib.RESET} unique signatures. Parsing functions...', not args.verbose)
-    log('info', f'Determining function entry points and resolving signatures...', not args.verbose)
+    log('info', f'Found {colorLib.CYAN}{len(signatures)}{colorLib.RESET} unique signatures. Parsing functions...', True)
+    log('info', f'Determining function entry points and resolving signatures...', True)
   
   except:
     
@@ -82,7 +80,7 @@ def resolveFunctions(assembly, args, output):
   else:
     
     # else, load the cache and save time
-    log('info', 'Loaded signatures from cache!', not args.verbose)
+    log('info', 'Loaded signatures from cache!', True)
     indicesDict = loadFileAsPickle(f'{output}/__cache__/indices.pickle')
     potentialDict = loadFileAsPickle(f'{output}/__cache__/signatures.pickle')
 
@@ -93,7 +91,7 @@ def resolveFunctions(assembly, args, output):
 
   # for each function signature, create a new function object with some more information from the cache / resolved values
   # each object will be appended to a list of function objects for writing
-  log('info', f'Determining function parameters, views, and returns...', not args.verbose)
+  log('info', f'Determining function parameters, views, and returns...', True)
   for sig in progress_bar(signatures, args):
     try:
       function = Function(args, sig, assembly, endDispatcher, indices.inverse[sig], indices, potentialDict[sig])
@@ -105,7 +103,7 @@ def resolveFunctions(assembly, args, output):
     except Exception as e:
       
       # encountered an unexpected error, log it and continue
-      log('info', f'Ignoring signature {colorLib.CYAN}{hex(sig)}{colorLib.RESET}. Trace execution excepted!', not args.verbose)
+      log('info', f'Ignoring signature {colorLib.CYAN}{hex(sig)}{colorLib.RESET}. Trace execution excepted!', True)
       logTraceback(traceback.format_exc(), True)
       
   # build the log output and save all mappings / event logs to a list for writing
@@ -130,10 +128,10 @@ def resolveFunctions(assembly, args, output):
         mappings.append(f.mappings[mapping])
   
   # log some info about the functions
-  log('info', functionLogString, not args.verbose)
+  log('info', functionLogString, True)
   if all(func.view == True for func in functions):
-    log('warning', 'No non-view functions found. Is this a proxy contract?', not args.verbose)
-  log('info', f'Found {colorLib.CYAN}{len(events)}{colorLib.RESET} unique events. Resolving signatures...', not args.verbose)
+    log('warning', 'No non-view functions found. Is this a proxy contract?', True)
+  log('info', f'Found {colorLib.CYAN}{len(events)}{colorLib.RESET} unique events. Resolving signatures...', True)
   
   # if we are ignoring the cache or the cache doesnt exist, write the event logs to the cache
   if args.flush or args.ignore_cache or not pathExists(f'{output}/__cache__/events.pickle'):
@@ -155,7 +153,7 @@ def resolveFunctions(assembly, args, output):
     
     # write the events to the cache
     writeObj(f'{output}/__cache__/events.pickle', eventDict)
-    log('info', f'Resolved signature names.', not args.verbose)
+    log('info', f'Resolved signature names.', True)
   else:
     
     # the cache file exists, load the events

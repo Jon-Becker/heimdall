@@ -46,6 +46,7 @@ def main(argv=None):
   heimdall.add_argument('--beautify', help="Beautify contract, using statistical renaming", action="store_true")
   heimdall.add_argument('--default', help="Always use defaults when prompted for input", action="store_true")
   heimdall.add_argument('--flush', help="Flushes the cache", action="store_true")
+  heimdall.add_argument('--autoupdate', help="Toggle autoupdates", action="store_true")
   heimdall.add_argument('--ignore-cache', help="Ignores the cache (SLOWER!)", action="store_true")
   heimdall.add_argument('--open', '--edit', help="Attempts to open nano / edit on the operation", action="store_true")  
 
@@ -104,8 +105,9 @@ def main(argv=None):
           log('alert', f'This version of Heimdall is outdated!')
           update(version)
       else:
-        log('critical', f'Missing a mandatory argument (-m or --module). Use -h to show the help menu.')
-
+        print(getHelp())
+    
+    
   except KeyboardInterrupt:
     endTime = timer()
     log('critical', f'Operation aborted after {datetime.timedelta(seconds=(endTime-startTime))}.\n')

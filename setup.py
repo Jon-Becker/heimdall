@@ -2,7 +2,7 @@ from setuptools import Extension
 from setuptools import setup
 
 setup(name='eth_heimdall',
-      version='1.0.3b1',
+      version='1.0.3b4',
       description='Heimdall is an advanced and modular smart-contract toolkit which aims to make dealing with smart contracts on EVM based chains easier.',
       url='https://github.com/Jon-Becker/heimdall',
       entry_points={'console_scripts': ['heimdall=heimdall.__main__:main']},
@@ -10,6 +10,22 @@ setup(name='eth_heimdall',
       author='Jonathan Becker (jon-becker)',
       author_email='jonathan@jbecker.dev',
       license='MIT',
+      
+      classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'Intended Audience :: End Users/Desktop',
+        'Intended Audience :: Information Technology',
+        'License :: OSI Approved :: MIT License',
+        'Natural Language :: English',
+        'Programming Language :: Python',
+        'Topic :: Software Development :: Disassemblers',
+        'Topic :: Software Development :: Build Tools',
+        'Topic :: Software Development :: Interpreters',
+        'Topic :: Utilities'
+      ],
+      
       packages=[
         'heimdall',
         'heimdall/lib',
@@ -32,6 +48,4 @@ setup(name='eth_heimdall',
           'argcomplete',
           'eth_abi'
       ],
-      )
-
-# Md36&deveZgNiJqN6HAXn
+)

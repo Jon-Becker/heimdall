@@ -1,5 +1,4 @@
 import json
-import pickle
 import pathlib
 
 from .utils.io import write, loadFileAsJson
@@ -29,7 +28,9 @@ def getConfig():
         }
       }
     }
-    json.dump(conf, f'{pathlib.Path(__file__).parent.parent.resolve()}/env/conf.json')
+    
+    with open(getConfigPath(), 'w') as outfile:
+      json.dump(conf, outfile, indent=4)
     return conf
 
 # get the config file path, because it can be hidden in pypi directories

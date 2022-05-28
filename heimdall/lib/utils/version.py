@@ -1,4 +1,5 @@
 import json
+import re
 import pip_api
 import requests
 
@@ -36,7 +37,13 @@ def getLatestSolidityRelease():
 def checkVersionUpToDate():
   remoteVersion = getRemoteVersion()
   localVersion = getLocalVersion()
-  return (remoteVersion == localVersion, remoteVersion)
+  remoteVersionList = re.sub(r'[^0-9\.]' , '' , remoteVersion).split('.')
+  localVersionList = re.sub(r'[^0-9\.]' , '' , localVersion).split('.')
+  
+  # Check each remote version according to SemVer and compare to local version
+  isUpToDate = not ((remoteVersionList[0] > localVersionList[0]) or (remoteVersionList[1] > localVersionList[1]) or (remoteVersionList[2] > localVersionList[2]))
+  
+  return (isUpToDate, remoteVersion)
 
 # performs a silent update of eth-heimdall through pip
 def update(version):
@@ -45,12 +52,12 @@ def update(version):
     log('info', f'Installing latest version {colorLib.CYAN + version[1] + colorLib.RESET}...')
     from subprocess import DEVNULL, STDOUT, check_call
     
-    result = check_call(['python3', '-m', 'pip', 'install', 'eth-heimdall', '-U'], stdout=DEVNULL, stderr=STDOUT)
+    check_call(['python3', '-m', 'pip', 'install', 'eth-heimdall', '-U'], stdout=DEVNULL, stderr=STDOUT)
 
     if checkVersionUpToDate()[0]:
       log('success', f'Successfully updated to eth-heimdall {colorLib.GREEN + getLocalVersion() + colorLib.RESET}.')
     else:
       log('critical', 'Failed to install newest version of eth-heimdall from PyPi!')
   else:
-    log('alert', f'You can update to version {colorLib.GREEN}{version[1]}{colorLib.RESET} by running: {colorLib.GREEN}pip install eth-heimdall --upgrade{colorLib.RESET} !')
-    log('info', f'You can toggle autoupdates by running {colorLib.CYAN}heimdall -m config --toggle-autoupdate{colorLib.RESET}.')
+    log('alert', f'You can update to version {colorLib.GREEN}{version[1]}{colorLib.RESET} by running: {colorLib.GREEN}pip install eth-heimdall=={version[1]} --U{colorLib.RESET} !')
+    log('info', f'You can toggle autoupdates by running {colorLib.CYAN}heimdall config --autoupdate{colorLib.RESET}.')

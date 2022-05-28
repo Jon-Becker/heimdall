@@ -14,15 +14,15 @@ heimdall -m decompile -t TARGET
 
 ### Optional Arguments
 
-| Argument | Alias      | Required | Variable | Description                           |
-| -------- | ---------- | -------- | -------- | ------------------------------------- |
-| -t       | --target   | YES      | TARGET   | Target of operation (file or address) |
-| -o       | --output   | NO       | PATH     | Custom output path                    |
-| -c       | --chain    | NO       | ID       | Chain ID of target (if applicable)    |
-| -p       | --provider | NO       | URL      | URL of provider / node. Will default to config value if not present |
-| --default | N/A       | NO       | N/A      | Will automatically select default value when prompted during module execution |
-| --flush  | --ignore-cache | NO   | N/A      | Won't reuse cached values             |
-| --indent  | N/A | NO   | N/A      | Set the desired indent level for the decompiled contract             |
+| Argument  | Alias          | Required | Variable | Description                                                                   |
+| --------- | -------------- | -------- | -------- | ----------------------------------------------------------------------------- |
+| -t        | --target       | YES      | TARGET   | Target of operation (file or address)                                         |
+| -o        | --output       | NO       | PATH     | Custom output path                                                            |
+| -c        | --chain        | NO       | ID       | Chain ID of target (if applicable)                                            |
+| -p        | --provider     | NO       | URL      | URL of provider / node. Will default to config value if not present           |
+| --default | N/A            | NO       | N/A      | Will automatically select default value when prompted during module execution |
+| --flush   | --ignore-cache | NO       | N/A      | Won't reuse cached values                                                     |
+| --indent  | N/A            | NO       | N/A      | Set the desired indent level for the decompiled contract                      |
 
 ### Postprocessing Values
 

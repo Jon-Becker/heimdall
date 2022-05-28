@@ -42,7 +42,7 @@ def getModules(args=None):
         
         # if a module fails to mount, log the error and continue to other modules
         log('warning', f'Module {colorLib.YELLOW}{item}{colorLib.RESET} failed to mount!')
-        logTraceback(traceback.format_exc(), not args.verbose)
+        logTraceback(traceback.format_exc(), True)
   
   # write the hashsums to the dist file, will be used when we have a package manager
   write(f'{pathlib.Path(__file__).parent.resolve()}/dist.json', json.dumps(dist, indent=4))

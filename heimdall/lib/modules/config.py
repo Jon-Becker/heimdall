@@ -30,6 +30,6 @@ def main(args):
       os.system(f'edit {configPath}')
       
   # if they want to toggle autoupdate, set it in config
-  if '--toggle-autoupdate' in args and args.__dict__['--toggle-autoupdate']:
+  if args.autoupdate:
     write_config_value_at_path(getConfigPath(), 'autoupdate', not getConfig()['autoupdate'])
     log('info', f"PyPi autoupdating is set to: {colorLib.CYAN}{'true' if getConfig()['autoupdate'] else 'false'}{colorLib.RESET}")
