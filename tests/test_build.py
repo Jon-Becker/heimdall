@@ -1,7 +1,7 @@
 import pathlib
 
 def test_virtualenv(virtualenv):
-    assert virtualenv.python.endswith('/bin/python')
+    assert 'python' in virtualenv.python
     
 def test_installing(virtualenv):
     if 'eth-heimdall' in [i for i in virtualenv.installed_packages()]:

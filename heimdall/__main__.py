@@ -51,14 +51,14 @@ def main(argv=None):
   heimdall.add_argument('--open', '--edit', help="Attempts to open nano / edit on the operation", action="store_true")  
 
   # parse arguments
-  (args, extras) = heimdall.parse_known_args()
+  (args, extras) = heimdall.parse_known_args(argv if argv else None)
   
   # if theres an extra argument, it's assumed to be the module.
   # this will allow commands like `heimdall config` instead of `heimdall -m config`
   if len(extras) == 1:
     args.__setattr__('module', extras[0])
   
-  log('debug', " ".join(sys.argv), args.module != 'debug')
+  log('debug', " ".join(argv if argv else sys.argv), args.module != 'debug')
   log('debug', f'Uname: {platform.uname()}', args.module != 'debug')
   log('debug', f'Checksum: {checksum(f"{pathlib.Path(__file__).parent.resolve()}/lib")}', args.module != 'debug')
   log('debug', f'Heimdall Version: {getLocalVersion()}', args.module != 'debug')
@@ -85,7 +85,7 @@ def main(argv=None):
               break
         if not handled:
           log('critical', f'Module {colorLib.RED}{args.module}{colorLib.RESET} not found. Use -h to show the help menu.')
-          raise KeyError
+          raise KeyError(f'Module {args.module} not found.')
           
         # run the selected module
         try:
