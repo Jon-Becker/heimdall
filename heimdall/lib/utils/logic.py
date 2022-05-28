@@ -206,7 +206,7 @@ def solidify(opcode, vm, func, *_args, mem={}, mappings={}):
     _rets = []
     mem['raw'] = sha3(vm.memory.read(0, 64)).hex()
     for n in range(math.floor(args[1] / 32)):
-      _rets.append(_offsetToMemoryName(n*32))
+      _rets.append(offsetToMemoryName(n*32))
       mem[n] = {
         "value": vm.memory.read(n*32, 32).hex(),
         "source": _rets
@@ -215,7 +215,7 @@ def solidify(opcode, vm, func, *_args, mem={}, mappings={}):
   
   # if we are loading from memory, we need to convert the offset into a memory name
   if opcode == "MLOAD":
-    return (_offsetToMemoryName(args[0]), mem, mappings)
+    return (offsetToMemoryName(args[0]), mem, mappings)
   
   # if we are loading from storage and theres a keccak in the unwrapped stack, its most likely a mapping
   if opcode == "SLOAD" and any("keccak256" in str(arg) for arg in args):

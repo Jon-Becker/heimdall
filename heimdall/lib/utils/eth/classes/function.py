@@ -147,9 +147,7 @@ class Function():
                 
               # get and add all sources for the external call to the solidity logic
               source = solidify_wrapped(call['wrapped'][1], vm, self)
-              try:
-                [self.logic.append([call['pc'], f'bytes memory {source} = {self.memory[source]["value"]};']) for source in sources if re.match(r"var[0-9]*", source)]
-              except: pass
+              self.logic.append([call['pc'], f'bytes memory {source} = {self.memory[source]["value"]};'])
               
               # I'm sorry this is extremely ugly, we just have to actually parse these 
               # callParameters into a solidity staticcall, and I dont want a massive fstring
