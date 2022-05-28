@@ -44,3 +44,4 @@ heimdall/lib/utils/eth/classes/function.py
 heimdall/lib/utils/eth/classes/memory.py
 heimdall/lib/utils/eth/classes/stack.py
 heimdall/lib/utils/eth/classes/vm.py
+heimdall/logs/__init__.py
