@@ -1,4 +1,4 @@
-from heimdall.lib.utils.version import *
+import pathlib
 
 def test_virtualenv(virtualenv):
     assert virtualenv.python.endswith('/bin/python')
