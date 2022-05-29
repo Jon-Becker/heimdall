@@ -49,7 +49,6 @@ setup(name='eth_heimdall',
           'eth_abi',
           'eth_abi',
           'pip-api',
-          'platform',
           'numexpr',
       ],
 )
