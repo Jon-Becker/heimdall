@@ -7,7 +7,7 @@ from ...logic import Any, Logic, _match, bytesToType, commonTypes, determineType
 from ...apis.sigdir import resolve
 from ...eth.classes.vm import VirtualMachine
 from ...eth.classes.stack import Stack
-from ...logger import log, logTraceback, query, progress_bar
+from ...logger import log, logTraceback, query
 from ...colors import colorLib
 
 class Function():
@@ -43,7 +43,7 @@ class Function():
   # determines if the jumpdest is a jump to another function
   # ( I think this could be somehow used to find internal functions, dont quote me on that )
   def isFunctionCall(self, dest):
-    return dest in [item for sublist in self.indices.keys() for item in sublist]
+    return dest if (dest in [item for sublist in self.indices.keys() for item in sublist]) else None
 
   # determines the entry point of the function
   def getEntryPoint(self):
@@ -123,15 +123,6 @@ class Function():
             elif call['opcode'] == "SSTORE":
               key = solidify_wrapped(("SLOAD", Any, call['wrapped'][0]), vm, self)
               value = solidify_wrapped(call["wrapped"][1:], vm, self)
-
-              # handling for mappings
-              if "_mapping_" in key:
-                if key.split("[")[0] not in self.mappings:
-                  self.mappings[key.split("[")[0]] = {
-                    'slot': key.split("[")[0],
-                    'key': 'uint256',
-                    'returns': 'uint256',
-                  }
                   
               # appending logic
               self.logic.append([call['pc'], f'{key} = {value};'])
@@ -263,13 +254,13 @@ class Function():
                 
                 # trace backwards through the stacktrace to find the call that caused the revert
                 for call in reversed(vm.stacktrace):
-                  if call['opcode'] == 'JUMPI' and call['wrapped'][1][0] :
+                  if call['opcode'] == 'JUMPI' and call['wrapped'][1][0]:
                     
                     # calculate the solidity value of the revert reason
                     revert_reason = solidify_wrapped(call["wrapped"][1], vm, self)
                     
                     # payable detection, pretty crude but working as of ^0.8.14.
-                    if revert_reason == '(msg.value) == 0':
+                    if 'msg.value == 0' in re.sub(r'[\(\)]*', '', revert_reason):
                       self.payable = False
                     
                     # write the require statements with the revert reasons if applicable, skipping internal requires

@@ -8,8 +8,11 @@ from .logic import Logic
 
 def postProcess(_line, signatures, events, constantStorage):
   
-  # cleaning up SHL that don't actually do anything
-  _line = _line.replace(r' << 1 - 1', '')
+  # cleaning up logic that doesn't actually do anything
+  _line = re.sub(r'( << 1 - 1|\/ 1|0 + | + 0)', '', _line)
+
+  # cleaning up redundant castings
+  
   try:
     cleaned = _line
     
@@ -32,42 +35,8 @@ def postProcess(_line, signatures, events, constantStorage):
           handled = True
           break
       if not handled:
-        cleaned = cleaned.replace(storage[i], f'storage[{access}]')
+        cleaned = cleaned.replace(storage[i], f'_storage_{hex(int(access))}')
         
-    
-      # replace all masks with type casting
-      casting = re.findall(r'MASK{.*?}', cleaned, re.IGNORECASE)
-      for i, cast in enumerate(casting):
-        try:
-          mask = 0
-          cast = cast.replace("MASK{", "").replace("}", "")
-          temp = cast
-          argArray = cast.split(" & ")
-          
-          # TODO: fix casting detection
-          if argArray[0].isnumeric():
-            mask = int(argArray[0])
-            temp = argArray[1]
-          elif argArray[1].isnumeric():
-            mask = int(argArray[1])
-            temp = argArray[0]
-          else:
-            for j, arg in enumerate(argArray):
-              try:
-                mask = eval(arg)
-                if type(mask) == int:
-                  temp = argArray[1 if j == 0 else 0]
-                  break
-              except:
-                pass
-              
-          if mask != 0:
-            temp = f'{Logic.resolveMask({"val": (len(hex(mask)[2:])*4), "isPointer": False})[0]}({temp})'
-          
-          cleaned = cleaned.replace(casting[i], temp)
-        except:
-          logTraceback(traceback.format_exc(), True)
-
   except Exception as e:
     logTraceback(traceback.format_exc(), True)
   return cleaned

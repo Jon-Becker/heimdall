@@ -2,6 +2,7 @@ import os
 import re
 import json
 import traceback
+import multiprocessing
 
 from bidict import bidict
 
@@ -105,7 +106,7 @@ def resolveFunctions(assembly, args, output):
       # encountered an unexpected error, log it and continue
       log('info', f'Ignoring signature {colorLib.CYAN}{hex(sig)}{colorLib.RESET}. Trace execution excepted!', True)
       logTraceback(traceback.format_exc(), True)
-      
+  
   # build the log output and save all mappings / event logs to a list for writing
   functionLogString = f'Determined return, typing, and parameters.'
   for i, f in enumerate(functions):
@@ -183,7 +184,7 @@ def resolveFunctions(assembly, args, output):
   constantStorage = {}
   for func in functions:
     if func.constant != False:
-      constantStorage[func.name] = func.constant
+      constantStorage[func.name.replace('func_', 'storage_')] = func.constant
     abi.append({
       "type": "function",
       

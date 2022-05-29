@@ -61,11 +61,11 @@ Please keep in mind as more modules are released, module numbers may change. It'
 
 Specific module documentation can be found in the ``/docs`` folder, or quickly navigate using the links beow.
 
-| Module Name | Description | Documentation URL |
-| ----------- | ----------- | ----------------- |
-| Config      | Heimdall Configuration Module | [Documentation](https://github.com/Jon-Becker/heimdall/blob/main/docs/config.md)
-| Debug      | Heimdall Debug Module | [Documentation](https://github.com/Jon-Becker/heimdall/blob/main/docs/debug.md)
-| Decompile   | Decompiles EVM bytecode > Solidity | [Documentation](https://github.com/Jon-Becker/heimdall/blob/main/docs/decompile.md)
+| Module Name | Description                        | Documentation URL                                                                   |
+| ----------- | ---------------------------------- | ----------------------------------------------------------------------------------- |
+| Config      | Heimdall Configuration Module      | [Documentation](https://github.com/Jon-Becker/heimdall/blob/main/docs/config.md)    |
+| Debug       | Heimdall Debug Module              | [Documentation](https://github.com/Jon-Becker/heimdall/blob/main/docs/debug.md)     |
+| Decompile   | Decompiles EVM bytecode > Solidity | [Documentation](https://github.com/Jon-Becker/heimdall/blob/main/docs/decompile.md) |
 
 ## Configuration
 

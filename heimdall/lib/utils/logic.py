@@ -5,13 +5,13 @@ class Match:
   pass
 
 import math
-from time import time
+import re
 import traceback
-import numpy as np
+import numexpr
 
+from time import time
 from bidict import bidict
 from eth_abi import decode_abi
-from re import L, M
 from Crypto.Hash import keccak
 from heimdall.lib.utils.logger import logTraceback
 sha3 = lambda x: keccak.new(digest_bits=256, data=x).digest()
@@ -125,7 +125,7 @@ class Logic:
   
   # convert a mask argument into a solidity type
   def resolveMask(args):
-    arg = args['val']
+    arg = abs(args['val'])
     isPointer = args['isPointer']
     masks = bidict({
         ("bool", "bytes", "uint", "int", 'uint256', 'int256'): -1,
@@ -141,7 +141,7 @@ class Logic:
     if arg in masks.inverse:
       ret += list(masks.inverse[arg])
     else:
-      ret += ['uint256', 'int256', 'uint', 'int',]
+      ret += ['address', 'uint256', 'int256', 'uint', 'int',]
     if arg % 2 == 0:
       bytesize = math.floor( ((arg/8)) )
       ret += [f"bytes{bytesize}", f"bytes{32-bytesize}", f"bytes"]
@@ -163,7 +163,7 @@ def solidify_wrapped(_wrapped, vm, func=None):
         if "PUSH" in _arg[2]:
           args.append(_arg[1])
         elif "CALLDATALOAD" in _arg[2]:
-          args.append(f'arg{math.floor((_arg[0]-4)/32)}')
+          args.append(f"arg{math.floor((_arg[0] - 4)/32)}")
         else:
           args.append(_arg[2])
       else:
@@ -200,12 +200,12 @@ def solidity_operation(_op, vm, func):
 
 def solidify(opcode, vm, func, *_args, mem={}, mappings={}):
   args = list(_args) + [None for x in range(7)]
-  
+    
   # if we run a keccak, save the value to a memory location for later use in mapping calculation
   if opcode == "SHA3":
     _rets = []
     mem['raw'] = sha3(vm.memory.read(0, 64)).hex()
-    for n in range(math.floor(args[1] / 32)):
+    for n in range(math.floor(int(re.sub(r'[^0-9]', '', str(args[1]))) / 32)):
       _rets.append(offsetToMemoryName(n*32))
       mem[n] = {
         "value": vm.memory.read(n*32, 32).hex(),
@@ -221,15 +221,66 @@ def solidify(opcode, vm, func, *_args, mem={}, mappings={}):
   if opcode == "SLOAD" and any("keccak256" in str(arg) for arg in args):
     mappingSlot = int(mem[1]['value'], 16) if 1 in mem else 0
     if mappingSlot <= 32:
+      
+      # add mapping to the function mapping dict
+      if mappingSlot not in func.mappings:
+        func.mappings[mappingSlot] = {
+          'slot': mappingSlot,
+          'key': 'uint256',
+          'returns': 'uint256',
+        }
+        
       if not isinstance(func.memory["var00"]["value"], (str)) and hex(func.memory["var00"]["value"]).startswith("0x4e487b71"):
         if isinstance(func.memlast["var00"]["value"], (str)):
-          return (f'_mapping_{mappingSlot}[{func.memlast["var00"]["value"]}]', mem, mappings)
-        return (f'_mapping_{mappingSlot}[EVM_PANIC]', mem, mappings)
-      return (f'_mapping_{mappingSlot}[{func.memory["var00"]["value"]}]', mem, mappings)
+          return (f'mapping_{mappingSlot}[{func.memlast["var00"]["value"]}]', mem, mappings)
+        return (f'mapping_{mappingSlot}[EVM_PANIC]', mem, mappings)
+      return (f'mapping_{mappingSlot}[{func.memory["var00"]["value"]}]', mem, mappings)
     elif m := resolveSlot(hex(mappingSlot)[2:]):
-      return (f'_mapping_{m}[{func.memlast["var00"]["value"]}][{func.memory["var00"]["value"]}]', mem, mappings)
+      
+      # add mapping to the function mapping dict
+      if m not in func.mappings:
+        func.mappings[m] = {
+          'slot': m,
+          'key': 'uint256',
+          'returns': 'uint256',
+        }
+        
+      return (f'mapping_{m}[{func.memlast["var00"]["value"]}][{func.memory["var00"]["value"]}]', mem, mappings)
     else:
-      return (f'_mapping_generic[{func.memlast["var00"]["value"]}][{func.memory["var00"]["value"]}]', mem, mappings)
+      return (f'mapping_generic[{func.memlast["var00"]["value"]}][{func.memory["var00"]["value"]}]', mem, mappings)
+
+  # if the arg contains only arithmetic operations, evaluate them safely
+  for i, arg in enumerate(args):
+    if isArithmatic(str(arg)):
+      try:
+        args[i] = numexpr.evaluate(str(arg)).item()
+      except: 
+        args[i] = (2 ** 256 - 1)
+  
+  # handle variable casting to solidity type
+  if opcode == 'AND':
+    mask = False
+    
+    if isinstance(args[0], (int,)) or args[0].isnumeric():
+      mask = int(args[0])
+      temp = args[1]
+    elif isinstance(args[1], (int,)) or args[1].isnumeric():
+      mask = int(args[1])
+      temp = args[0]
+      
+    if mask:
+      # mask can either be the 0xFFFFFF kind or bitlength kind
+      if re.match('(0x)?[fF]*', hex(mask)):
+        castingType = Logic.resolveMask({"val": (len(hex(mask)[2:])*4), "isPointer": False})[0]
+      else:
+        castingType = Logic.resolveMask({"val": mask, "isPointer": False})[0]
+      
+      # make sure the variable isnt already cast to the type we are casting to
+      isAlreadyCast = (re.match(r'^(int(\d+)?|uint(\d+)?|address|bytes(\d+)?|string|bool)\(.*?\)$', str(temp))) and (temp.split('(')[0] == castingType)
+      
+      if not isAlreadyCast: 
+        return (f'{castingType}({temp})', mem, mappings)
+      return (temp, mem, mappings)
   
   # constant solidity values for other opcodes
   solidified = {
@@ -244,19 +295,19 @@ def solidify(opcode, vm, func, *_args, mem={}, mappings={}):
     'MULMOD': f'({args[0]} * {args[1]}) % {args[2]}',
     'EXP': f'{args[0]} ** {args[1]}',
     'SIGNEXTEND': f'SIGNEXTEND({args[0]}, {args[1]})',
-    'LT': f'{args[0]} < {args[1]}',
-    'GT': f'{args[0]} > {args[1]}',
-    'SLT': f'{args[0]} < {args[1]}',
-    'SGT': f'{args[0]} > {args[1]}',
-    'EQ': f'{args[0]} == {args[1]}',
+    'LT': f'({args[0]}) < ({args[1]})',
+    'GT': f'({args[0]}) > ({args[1]})',
+    'SLT': f'({args[0]}) < ({args[1]})',
+    'SGT': f'({args[0]}) > ({args[1]})',
+    'EQ': f'({args[0]}) == ({args[1]})',
     'ISZERO': f'({args[0]}) == 0',
-    'AND': f'MASK{{{args[0]} & {args[1]}}}',
+    'AND': f'{args[0]} & {args[1]}',
     'OR': f'{args[0]} | {args[1]}',
     'XOR': f'{args[0]} ^ {args[1]}',
     'NOT': f'~({args[0]})',
     'BYTE': f'({args[0]} >> (248 - {args[1]} * 8)) && 0xFF',
     'SHL': f'{args[0]} << {args[1]}',
-    'SHR': f'{args[0]} >> {args[1]}',
+    'SHR': f'({args[0]}) >> ({args[1]})',
     'SAR': f'{args[0]} >> {args[1]}',
     'SHA3': f'keccak256({args[0]})',
     'LOG0': f'emit {args[0]}()',
@@ -401,3 +452,8 @@ def offsetToMemoryName(offset):
     return f'var{hex(math.floor(offset/4))[2:].ljust(2, "0")}'
   except:
     return offset
+  
+# ensures that s includes only the allowed characters for expressions.
+def isArithmatic(s):  
+  allowed_charset = "0123456789-+/*()%^<>!&|~. "
+  return all(ch in allowed_charset for ch in s)

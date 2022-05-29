@@ -9,7 +9,7 @@ import traceback
 
 from timeit import default_timer as timer
 
-from .lib.utils.io import checksum
+from .lib.utils.io import checksum, delete
 from .lib.menus.help import getHelp
 from .lib.utils.colors import colorLib
 from .lib.menus.header import getHeader
@@ -58,19 +58,19 @@ def main(argv=None):
   if len(extras) == 1:
     args.__setattr__('module', extras[0])
   
-  log('debug', " ".join(sys.argv), args.module != 'debug')
-  log('debug', f'Uname: {platform.uname()}', args.module != 'debug')
-  log('debug', f'Checksum: {checksum(f"{pathlib.Path(__file__).parent.resolve()}/lib")}', args.module != 'debug')
-  log('debug', f'Heimdall Version: {getLocalVersion()}', args.module != 'debug')
+  log('debug', " ".join(sys.argv), True)
+  log('debug', f'Uname: {platform.uname()}', True)
+  log('debug', f'Checksum: {checksum(f"{pathlib.Path(__file__).parent.resolve()}/lib")}', True)
+  log('debug', f'Heimdall Version: {getLocalVersion()}', True)
   
+  startTime = timer()
   try:
     if args.help:
-      
       print(getHelp())
+      delete(logfile)
     else:
       if args.module:
         handled = False
-        startTime = timer()
 
         # get the selected module
         available_modules = getModules(args)
@@ -93,10 +93,7 @@ def main(argv=None):
         except Exception as e:
           logTraceback(traceback.format_exc(), True)
           log('critical', f'Execution failed! Advanced logs available at {colorLib.RED + colorLib.UNDERLINE + logfile + colorLib.RESET} .')
-          
-        endTime = timer()
-        log('info', f'Operation completed in {datetime.timedelta(seconds=(endTime-startTime))}.')
-        
+                
         # run version check after module execution to minimize startup time 
         # from command send -> first log
         version = checkVersionUpToDate()
@@ -105,7 +102,13 @@ def main(argv=None):
           update(version)
       else:
         log('critical', f'Missing a mandatory argument (-m or --module). Use -h to show the help menu.')
+        delete(logfile)
+        sys.exit(0)
     
+      endTime = timer()
+      log('info', f'Operation completed in {datetime.timedelta(seconds=(endTime-startTime))}.')
+      if args.module in ('debug', 'config'):
+        delete(logfile)
     
   except KeyboardInterrupt:
     endTime = timer()

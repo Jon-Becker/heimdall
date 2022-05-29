@@ -93,7 +93,7 @@ pragma solidity {getLatestSolidityRelease()};
   ///                     Please keep in mind multiple mappings may be marked as this generic
   ///                     mapping but still be separate mappings.
   
-  mapping(bytes => mapping(bytes => bytes)) public _mapping_generic;
+  mapping(bytes => mapping(bytes => bytes)) public mapping_generic;
   ''', natspec=True)
     
     # write all variables found to the decompiled file
@@ -107,7 +107,7 @@ pragma solidity {getLatestSolidityRelease()};
       # if we have mappings, we need to write them first
       if len(mappings) > 0:
         for mapping in mappings:
-          addline(f'mapping({mapping["key"]} => {mapping["returns"]}) public {mapping["slot"]};')
+          addline(f'mapping({mapping["key"]} => {mapping["returns"]}) public mapping_{mapping["slot"]};')
         addline(n=1)
       
       # for each variable in the abi, write the variable declaration
