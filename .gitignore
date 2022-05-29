@@ -6,6 +6,7 @@ dist/*
 output/
 output/*
 *.egg-info
+publish.py
 *.egg-info/*
 __pycache__/
 __pycache__/*

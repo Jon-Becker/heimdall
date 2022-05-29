@@ -1,12 +1,12 @@
 {
     "build": {
-        "version": "v1.0.3-stable"
+        "version": "1.0.3b5"
     },
     "autoupdate": false,
     "defaults": {
         "providers": {
             "local": "http://127.0.0.1:7545",
-            "remote": "https://mainnet.infura.io/v3/8c881f604b91403ebe9d8300e26e8fcc"
+            "remote": "https://mainnet.infura.io/v3/"
         }
     },
     "environment": {

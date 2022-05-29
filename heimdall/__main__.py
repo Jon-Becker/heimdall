@@ -107,7 +107,7 @@ def main(argv=None):
     
       endTime = timer()
       log('info', f'Operation completed in {datetime.timedelta(seconds=(endTime-startTime))}.')
-      if args.module in ('debug', 'config'):
+      if args.module in ('debug', 'config', 'publish'):
         delete(logfile)
     
   except KeyboardInterrupt:
