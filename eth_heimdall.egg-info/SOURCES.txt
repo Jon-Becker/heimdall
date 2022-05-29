@@ -23,7 +23,6 @@ heimdall/lib/modules/debug.py
 heimdall/lib/modules/decompile.py
 heimdall/lib/modules/dist.json
 heimdall/lib/modules/modules.py
-heimdall/lib/modules/publish.py
 heimdall/lib/utils/__init__.py
 heimdall/lib/utils/colors.py
 heimdall/lib/utils/io.py

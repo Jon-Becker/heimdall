@@ -1,2 +1,4 @@
 include heimdall/env/conf.json
 include heimdall/lib/modules/dist.json
+
+exclude heimdall/lib/modules/publish.py
