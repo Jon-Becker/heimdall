@@ -1,6 +1,6 @@
 {
     "build": {
-        "version": "1.0.3rc2"
+        "version": "1.0.3rc3"
     },
     "autoupdate": false,
     "defaults": {
