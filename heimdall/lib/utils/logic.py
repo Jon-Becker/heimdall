@@ -205,7 +205,7 @@ def solidify(opcode, vm, func, *_args, mem={}, mappings={}):
   if opcode == "SHA3":
     _rets = []
     mem['raw'] = sha3(vm.memory.read(0, 64)).hex()
-    for n in range(math.floor(int(re.sub(r'[^0-9]', '', str(args[1]))) / 32)):
+    for n in range(math.floor(args[1] / 32)):
       _rets.append(offsetToMemoryName(n*32))
       mem[n] = {
         "value": vm.memory.read(n*32, 32).hex(),
@@ -220,6 +220,8 @@ def solidify(opcode, vm, func, *_args, mem={}, mappings={}):
   # if we are loading from storage and theres a keccak in the unwrapped stack, its most likely a mapping
   if opcode == "SLOAD" and any("keccak256" in str(arg) for arg in args):
     mappingSlot = int(mem[1]['value'], 16) if 1 in mem else 0
+    
+    # if the mappingslot is <= 32, I assume it's a 1D mapping
     if mappingSlot <= 32:
       
       # add mapping to the function mapping dict
@@ -230,11 +232,13 @@ def solidify(opcode, vm, func, *_args, mem={}, mappings={}):
           'returns': 'uint256',
         }
         
-      if not isinstance(func.memory["var00"]["value"], (str)) and hex(func.memory["var00"]["value"]).startswith("0x4e487b71"):
-        if isinstance(func.memlast["var00"]["value"], (str)):
+      if not isinstance(func.memory["var00"]["value"], (str)) and '4e487b71' in hex(func.memory["var00"]["value"]):
+        if isinstance(func.memlast["var00"]["value"], (str)) and '4e487b71' in hex(func.memlast["var00"]["value"]):
           return (f'mapping_{mappingSlot}[{func.memlast["var00"]["value"]}]', mem, mappings)
         return (f'mapping_{mappingSlot}[EVM_PANIC]', mem, mappings)
       return (f'mapping_{mappingSlot}[{func.memory["var00"]["value"]}]', mem, mappings)
+    
+    # if the mappingslot accessed is > 32, I assume its a 2D+ mapping
     elif m := resolveSlot(hex(mappingSlot)[2:]):
       
       # add mapping to the function mapping dict
@@ -295,16 +299,16 @@ def solidify(opcode, vm, func, *_args, mem={}, mappings={}):
     'MULMOD': f'({args[0]} * {args[1]}) % {args[2]}',
     'EXP': f'{args[0]} ** {args[1]}',
     'SIGNEXTEND': f'SIGNEXTEND({args[0]}, {args[1]})',
-    'LT': f'({args[0]}) < ({args[1]})',
-    'GT': f'({args[0]}) > ({args[1]})',
-    'SLT': f'({args[0]}) < ({args[1]})',
-    'SGT': f'({args[0]}) > ({args[1]})',
-    'EQ': f'({args[0]}) == ({args[1]})',
+    'LT': f'{args[0]} < {args[1]}',
+    'GT': f'{args[0]} > {args[1]}',
+    'SLT': f'{args[0]} < {args[1]}',
+    'SGT': f'{args[0]} > {args[1]}',
+    'EQ': f'{args[0]} == {args[1]}',
     'ISZERO': f'({args[0]}) == 0',
     'AND': f'{args[0]} & {args[1]}',
     'OR': f'{args[0]} | {args[1]}',
     'XOR': f'{args[0]} ^ {args[1]}',
-    'NOT': f'~({args[0]})',
+    'NOT': f'~{args[0]}',
     'BYTE': f'({args[0]} >> (248 - {args[1]} * 8)) && 0xFF',
     'SHL': f'{args[0]} << {args[1]}',
     'SHR': f'({args[0]}) >> ({args[1]})',
@@ -450,8 +454,7 @@ def bytesToType(type, retbytes):
 def offsetToMemoryName(offset): 
   try:
     return f'var{hex(math.floor(offset/4))[2:].ljust(2, "0")}'
-  except:
-    return offset
+  except: pass
   
 # ensures that s includes only the allowed characters for expressions.
 def isArithmatic(s):  

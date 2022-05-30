@@ -8,5 +8,4 @@ argcomplete
 eth_abi
 eth_abi
 pip-api
-platform
 numexpr

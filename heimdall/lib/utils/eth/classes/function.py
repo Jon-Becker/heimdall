@@ -161,7 +161,7 @@ class Function():
             try:
               self.memlast[offsetToMemoryName(call["inputs"][0])] = self.memory[offsetToMemoryName(call["inputs"][0])]
             except:
-              pass
+              print
             self.memory[offsetToMemoryName(call["inputs"][0])] = {
               "value": solidify_wrapped(call["wrapped"][1:], vm, self),
               "pc": call['pc']
@@ -244,7 +244,7 @@ class Function():
           # determine the type of the return value
           if ret[0] == 0:
             if self.pure: self.pure = ret[1]
-            if self.returns in commonTypes(): self.returns = determineType(self, ret[1])
+            if self.returns in commonTypes():self.returns = determineType(self, ret[1])
           
           # the execution REVERTED
           elif ret[0] == 1:
@@ -262,6 +262,12 @@ class Function():
                     # payable detection, pretty crude but working as of ^0.8.14.
                     if 'msg.value == 0' in re.sub(r'[\(\)]*', '', revert_reason):
                       self.payable = False
+                    
+                    # add sources for require statements to the logic
+                    sources = re.findall(r'var\d*', revert_reason, re.IGNORECASE)
+                    for source in sources:
+                      try: self.logic.append([call['pc'], f'bytes memory {source} = {self.memory[source]["value"]};'])
+                      except: pass
                     
                     # write the require statements with the revert reasons if applicable, skipping internal requires
                     if any(reason in revert_reason for reason in ['arg', 'var', 'mapping', 'memory',]):
@@ -306,19 +312,16 @@ class Function():
     
     # if we are a pure function, calculate the return type
     if self.pure and self.pure != True:
-      
-        retval = str(bytesToType([self.returns], self.pure)[0])
-        if self.returns == 'address':
-          retval = Web3.toChecksumAddress(retval.lower())
-        elif self.returns == 'string':
-          retval = f'\'{retval}\''
+      retval = str(bytesToType([self.returns], self.pure)[0])
+      if self.returns == 'address':
+        retval = Web3.toChecksumAddress(retval.lower())
+      elif self.returns == 'string':
+        retval = f'\'{retval}\''
           
-        self.logic.append([0xFFFFFFFFFFFF, f'return {retval};'])
-    
     # handle the returns of some other functions. Needs improvement
     elif self.returns == 'bool':
       self.logic.append([0xFFFFFFFFFFFF, f'return true;'])
-    
+
     # handle matching resolved 4byte functions to potential names
     matches = []
     if self.potentialNames:

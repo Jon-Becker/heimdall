@@ -11,7 +11,8 @@ def postProcess(_line, signatures, events, constantStorage):
   # cleaning up logic that doesn't actually do anything
   _line = re.sub(r'( << 1 - 1|\/ 1|0 + | + 0)', '', _line)
 
-  # cleaning up redundant castings
+  # cleaning up EVM panics
+  _line = re.sub(r'(\d* (<<|>>) 1313373041|1313373041 (<<|>>) \d*)', 'EVM_PANIC', _line)
   
   try:
     cleaned = _line
@@ -25,7 +26,7 @@ def postProcess(_line, signatures, events, constantStorage):
           cleaned = cleaned.replace(eventPlaceholder[0], events[eventSignature]['name'])
     
     # replace all constant SLOADS with their names
-    storage = re.findall(r'LOAD\{[0-9]{0,3}\}', cleaned, re.IGNORECASE)
+    storage = re.findall(r'LOAD\{\d{0,3}\}', cleaned, re.IGNORECASE)
     for i, access in enumerate(storage):
       access = access.replace("LOAD{", "").replace("}", "")
       handled = False

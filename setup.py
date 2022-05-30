@@ -2,7 +2,7 @@ from setuptools import Extension
 from setuptools import setup
 
 setup(name='eth_heimdall',
-      version='1.0.3b7',
+      version='1.0.3rc1',
       description='Heimdall is an advanced and modular smart-contract toolkit which aims to make dealing with smart contracts on EVM based chains easier.',
       url='https://github.com/Jon-Becker/heimdall',
       entry_points={'console_scripts': ['heimdall=heimdall.__main__:main']},
@@ -49,7 +49,6 @@ setup(name='eth_heimdall',
           'eth_abi',
           'eth_abi',
           'pip-api',
-          'platform',
           'numexpr',
       ],
 )
