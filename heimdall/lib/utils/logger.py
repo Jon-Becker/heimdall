@@ -11,12 +11,14 @@ logfile = f'{pathlib.Path(__file__).parent.parent.parent.resolve()}/logs/heimdal
 
 # purge old log files
 def purgeOldLogfiles():
-  files = os.listdir(f'{pathlib.Path(__file__).parent.parent.parent.resolve()}/logs')
-  files.remove('__init__.py')
-  for file in files:
-      if int(file.split('-')[1].replace('.log', '')) < int(datetime.datetime.now().strftime("%Y%m%d%H%M%S")) - 100000:
-        os.remove(f'{pathlib.Path(__file__).parent.parent.parent.resolve()}/logs/{file}')
-    # if timestamp is over 1 day old
+  try:
+    files = os.listdir(f'{pathlib.Path(__file__).parent.parent.parent.resolve()}/logs')
+    files.remove('__init__.py')
+    for file in files:
+        if int(file.split('-')[1].replace('.log', '')) < int(datetime.datetime.now().strftime("%Y%m%d%H%M%S")) - 100000:
+          os.remove(f'{pathlib.Path(__file__).parent.parent.parent.resolve()}/logs/{file}')
+      # if timestamp is over 1 day old
+  except: pass
       
 # log to file, removing color codes
 def logStripColor(file, type, log):
