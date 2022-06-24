@@ -6,6 +6,7 @@ import pathlib
 import datetime
 import importlib
 import traceback
+import warnings
 
 from timeit import default_timer as timer
 
@@ -20,6 +21,7 @@ from .lib.utils.version import getLocalVersion, checkVersionUpToDate, update
 def main(argv=None):
   
   # clear screen and print header
+  warnings.filterwarnings("ignore")
   purgeOldLogfiles()
   command = 'clear'
   if os.name in ('nt', 'dos'):
