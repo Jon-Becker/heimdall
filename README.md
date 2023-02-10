@@ -1,5 +1,5 @@
 
-# Heimdall
+# Heimdall [DEPRECATED]
 
 ![preview](https://github.com/Jon-Becker/heimdall/blob/main/preview.png?raw=true)
 
