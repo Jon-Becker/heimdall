@@ -5,8 +5,8 @@
 
 Heimdall is an advanced and modular smart-contract toolkit which aims to make dealing with smart contracts on EVM based chains easier.
 
-### THIS REPOSITORY IS DEPRECATED AND WILL NOT BE UPDATED OR SUPPORTED.
-### YOU CAN FIND THE NEW VERSION HERE https://github.com/Jon-Becker/heimdall-rs/
+## THIS REPOSITORY IS DEPRECATED AND WILL NOT BE UPDATED OR SUPPORTED AS OF JUN 24, 2022.
+## YOU CAN FIND THE NEW VERSION HERE https://github.com/Jon-Becker/heimdall-rs/
 
 ## Installation & Usage
 ![version badge](https://badge.fury.io/py/eth-heimdall.svg) ![download badge](https://static.pepy.tech/personalized-badge/eth-heimdall?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads) ![build badge](https://img.shields.io/badge/License-MIT-g.svg) [![Build](https://github.com/Jon-Becker/heimdall/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/Jon-Becker/heimdall/actions/workflows/unit-tests.yml)
